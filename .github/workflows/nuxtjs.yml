@@ -31,7 +31,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSHKEY  }}
         script: |
-          cd /var/www/stitchit-front
+          cd /var/www/html/stitchit-front
           git pull origin production
           npm install
           npm run build
