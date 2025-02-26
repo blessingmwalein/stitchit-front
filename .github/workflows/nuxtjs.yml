@@ -16,23 +16,28 @@ jobs:
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 19.9.0 # Match your Node.js version
+        node-version: 20 # Use stable LTS version
+
+    - name: Update npm to latest
+      run: npm install -g npm@latest
 
     - name: Install Dependencies
       run: npm install
 
     - name: Build Nuxt App
-      run: npm run build
+      run: npx nuxt build # Ensure correct build
 
     - name: Deploy to Server via SSH
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSHKEY  }}
+        key: ${{ secrets.SSHKEY }}
         script: |
           cd /var/www/html/stitchit-front
           git pull origin production
           npm install
-          npm run build
-          pm2 restart nuxt || pm2 start npm --name "nuxt" -- start
+          npx nuxt build
+          pm2 delete nuxt || true
+          pm2 start npm --name "nuxt" -- run start
+          pm2 save
