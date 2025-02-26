@@ -59,7 +59,6 @@ export const useAuthStore = defineStore('auth', {
         if (data.value?.response.token) {
           this.token = data.value.response.token;
           this.user = data.value.response.user;
-
           // Store token in a cookie
           useCookie('auth_token', { maxAge: 60 * 60 * 24 * 7 }).value = data.value.response.token; // 7 days expiry
         }
