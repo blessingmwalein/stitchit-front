@@ -1,0 +1,43 @@
+name: Deploy Nuxt App
+
+on:
+  push:
+    branches:
+      - production # Change to your deployment branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20 # Use stable LTS version
+
+    - name: Update npm to latest
+      run: npm install -g npm@latest
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build Nuxt App
+      run: npx nuxt build # Ensure correct build
+
+    - name: Deploy to Server via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSHKEY }}
+        script: |
+          cd /var/www/html/stitchit-front
+          git pull origin production
+          npm install
+          npx nuxt build
+          pm2 delete nuxt || true
+          pm2 start npm --name "nuxt" -- run start
+          pm2 save
