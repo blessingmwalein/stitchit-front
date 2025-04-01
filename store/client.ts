@@ -24,7 +24,7 @@ export const useClientsStore = defineStore("client", {
           method: "POST",
           body: {
             ...this.createClientForm,
-            role: "Client",  // Explicitly set the role here
+            role: "client",  // Explicitly set the role here
             // Spread the rest of the fields
           },
           headers: { Authorization: `Bearer ${this.token}` },
