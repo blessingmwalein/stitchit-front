@@ -45,6 +45,14 @@ import LayoutDashboardIcon from "./LayoutDashboardIcon.vue";
 import UserGroupIcon from "./UserGroupIcon.vue";
 import BellIcon from "./BellIcon.vue";
 import BarChartIcon from "./BarChartIcon.vue";
+import ShopIcon from "./ShopIcon.vue";
+import ShopBag from "./ShopBag.vue";
+import PendingIcon from "./PendingIcon.vue";
+import UsersIcon from "./UsersIcon.vue";
+import LockIcon from "./LockIcon.vue";
+import EmailAtIcon from "./EmailAtIcon.vue";
+import PhoneIcon from "./PhoneIcon.vue";
+import MapPinIcon from "./MapPinIcon.vue";
 
 export {
   BellIcon,
@@ -94,4 +102,12 @@ export {
   MailBox,
   SendIcon,
   DraftIcon,
+  ShopIcon,
+  ShopBag,
+  PendingIcon,
+  UsersIcon,
+  LockIcon,
+  EmailAtIcon,
+  PhoneIcon,
+  MapPinIcon,
 };

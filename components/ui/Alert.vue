@@ -49,8 +49,8 @@ const variantClasses = {
     icon: 'text-success-500',
   },
   error: {
-    container: 'border-error-500 bg-error-50 dark:border-error-500/30 dark:bg-error-500/15',
-    icon: 'text-error-500',
+    container: 'border-red-500 bg-red-50 dark:border-red-500/30 dark:bg-red-500/15',
+    icon: 'text-red-500',
   },
   warning: {
     container: 'border-warning-500 bg-warning-50 dark:border-warning-500/30 dark:bg-warning-500/15',

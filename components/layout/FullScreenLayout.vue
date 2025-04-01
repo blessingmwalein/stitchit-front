@@ -3,6 +3,7 @@
     <main>
       <slot></slot>
     </main>
+    <NuxtSnackbar />
   </div>
 </template>
 
