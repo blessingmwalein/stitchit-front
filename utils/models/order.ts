@@ -34,12 +34,20 @@ export interface OrderData {
 export interface Order {
     id: number;
     rug_id: number;
+    order_number: string;
     size_id: null;
     rug: Rug;
     client_id: number;
     client_name: string;
     unit: string;
     email: string;
+    length: number;
+    width: number;
+    shape: string;
+    phone_number: string;
+    address: string;
+    city: string;
+    gender: string;
     total_price: number;
     color_palet: string[];
     image_url: string;
@@ -57,6 +65,7 @@ export interface Rug {
     type: string;
     approx_production_cost: number;
     approx_cost: number;
+    materials: string;
     created_at: Date;
     updated_at: Date;
 }
@@ -79,4 +88,13 @@ export interface Meta {
     prev_page_url: null;
     to: number;
     total: number;
+}
+
+
+export interface StartProductionRequest {
+    order_id:               number;
+    start_date:             Date;
+    approx_end_date:        Date;
+    // status:                 string;
+    approx_production_cost: number;
 }

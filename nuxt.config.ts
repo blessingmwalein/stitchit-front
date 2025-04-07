@@ -4,11 +4,12 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   modules: [
-    "@pinia/nuxt", 
-    "nuxt-snackbar", 
-    "@nuxtjs/tailwindcss", 
-    "@primevue/nuxt-module", 
-    "@vueform/nuxt"
+    "@pinia/nuxt",
+    "nuxt-snackbar",
+    "@nuxtjs/tailwindcss",
+    "@primevue/nuxt-module",
+    "@vueform/nuxt",
+    '@sidebase/nuxt-pdf'
   ],
   css: ["~/assets/css/tailwind.css"],
   tailwindcss: {
@@ -45,6 +46,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: process.env.API_URL || "https://localhost:8000/api",
+      imageUrl: process.env.IMAGE_URL || "https://localhost:8000/storage",
       companyName: process.env.COMPANY_NAME || "My Company",
     },
   },

@@ -30,8 +30,8 @@
           <FileUpload title="Choose Design" mode="basic" @select="onFileSelect" customUpload auto severity="secondary"
             class="p-button-outlined" />
           <!-- Image Preview -->
-          <div v-if="imageSrc" class="image-container">
-            <img :src="imageSrc" alt="Image preview" class="image-preview" />
+          <div v-if="imageSrc || order?.image_url" class="image-container">
+            <img :src="imageSrcComputed" alt="Image preview" class="image-preview" />
           </div>
         </div>
   
@@ -81,6 +81,10 @@ import { useClientsStore } from '~/store/client';
 import { useOrderStore } from '~/store/orders';
 import { colorsData, shapesData, unitsData } from '~/utils/data/colors';
 import Alert from '~/components/ui/Alert.vue';
+import { useRuntimeConfig } from "#app";
+
+
+const config = useRuntimeConfig();
 
 const emit = defineEmits(['update:isOrderFormModal', 'success']);
 const rugsStore = useRugStore();
@@ -107,6 +111,10 @@ const orderForm = computed({
 });
 
 const closeModal = () => {
+
+  //clear form data
+  orderStore.setSelectedOrder(null);
+  orderStore.resetForm();
   emit('update:isOrderFormModal', false);
 };
 
@@ -117,6 +125,16 @@ onMounted(async () => {
     console.log(props.order);
     searchClients(props.order.client_name)
   }
+});
+
+//computed image src
+const imageSrcComputed = computed(() => {
+  if (imageSrc.value) {
+    return imageSrc.value;
+  } else if (props.order?.image_url) {
+    return `${config.public.imageUrl}${props.order.image_url}`;
+  }
+  return null;
 });
 
 const handleSubmit = async () => {

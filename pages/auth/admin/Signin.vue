@@ -51,7 +51,7 @@
                       <path
                         d="M15.6705 1.875H18.4272L12.4047 8.75833L19.4897 18.125H13.9422L9.59717 12.4442L4.62554 18.125H1.86721L8.30887 10.7625L1.51221 1.875H7.20054L11.128 7.0675L15.6705 1.875ZM14.703 16.475H16.2305L6.37054 3.43833H4.73137L14.703 16.475Z" />
                     </svg>
-
+  
                     Sign in with X
                   </button>
                 </div>
@@ -67,55 +67,71 @@
                   <div class="space-y-5">
                     <Alert v-if="authStore.errorMessage" variant="error" title="Something went wrong"
                       :message="authStore.errorMessage ?? ''" :showLink="false" />
-                    <!-- Email -->
-                    <CustomInputField v-model="email" label="Email*" type="email"
-                      :errorMessage="authStore.errors.email" />
-                      
-                    <CustomInputField v-model="password" label="Password*" type="password"
-                      :errorMessage="authStore.errors.password" />
+  
+                    <client-only>
+                      <Vueform @submit="handleSubmit" v-model="loginForm" :show-errors="false" :display-errors="false"
+                        :endpoint="false" sync>
+  
+                        <TextElement name="email" input-type="email" label="Email" :rules="['required', 'email']"
+                          :columns="{ container: 12 }" />
+  
+                        <TextElement name="password" input-type="password" label="Password" :rules="['required', 'min:6']"
+                          :columns="{ container: 12 }" :show-password="true" :toggle-password="togglePasswordVisibility"
+                          :show-password-icon="showPassword" />
+  
+  
+                        <ButtonElement button-class="bg-brand-500" name="login" :columns="{ container: 12 }"
+                          :submits="true" button-label="Login" :full="true" size="lg" />
+                      </Vueform>
+                    </client-only> <!-- Email -->
+                    <!-- <CustomInputField v-model="email" label="Email*" type="email"
+                            :errorMessage="authStore.errors.email" />
+                            
+                          <CustomInputField v-model="password" label="Password*" type="password"
+                            :errorMessage="authStore.errors.password" /> -->
                     <!-- Password -->
-
+  
                     <!-- Checkbox -->
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <label for="keepLoggedIn"
-                          class="flex items-center text-sm font-normal text-gray-700 cursor-pointer select-none dark:text-gray-400">
-                          <div class="relative">
-                            <input v-model="keepLoggedIn" type="checkbox" id="keepLoggedIn" class="sr-only" />
-                            <div :class="keepLoggedIn
-                              ? 'border-brand-500 bg-brand-500'
-                              : 'bg-transparent border-gray-300 dark:border-gray-700'
-                              " class="mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
-                              <span :class="keepLoggedIn ? '' : 'opacity-0'">
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                                  xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="1.94437"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                              </span>
+                    <!-- <div class="flex items-center justify-between">
+                            <div>
+                              <label for="keepLoggedIn"
+                                class="flex items-center text-sm font-normal text-gray-700 cursor-pointer select-none dark:text-gray-400">
+                                <div class="relative">
+                                  <input v-model="keepLoggedIn" type="checkbox" id="keepLoggedIn" class="sr-only" />
+                                  <div :class="keepLoggedIn
+                                    ? 'border-brand-500 bg-brand-500'
+                                    : 'bg-transparent border-gray-300 dark:border-gray-700'
+                                    " class="mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
+                                    <span :class="keepLoggedIn ? '' : 'opacity-0'">
+                                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="1.94437"
+                                          stroke-linecap="round" stroke-linejoin="round" />
+                                      </svg>
+                                    </span>
+                                  </div>
+                                </div>
+                                Keep me logged in
+                              </label>
                             </div>
+                            <router-link to="/forgot-password"
+                              class="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400">Forgot
+                              password?</router-link>
                           </div>
-                          Keep me logged in
-                        </label>
-                      </div>
-                      <router-link to="/forgot-password"
-                        class="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400">Forgot
-                        password?</router-link>
-                    </div>
-                    <!-- Button -->
+                        
                     <div>
                       <CustomButton type="submit" label="Sign In" variant="brand" :isLoading="authStore.isLoading"
-                        :disabled="authStore.isLoading" class="w-full" />
-                    </div>
+                        class="w-full" />
+                    </div> -->
                   </div>
                 </form>
                 <!-- <div class="mt-5">
-                  <p class="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                    Don't have an account?
-                    <router-link to="/signup" class="text-brand-500 hover:text-brand-600 dark:text-brand-400">Sign
-                      Up</router-link>
-                  </p>
-                </div> -->
+                        <p class="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
+                          Don't have an account?
+                          <router-link to="/signup" class="text-brand-500 hover:text-brand-600 dark:text-brand-400">Sign
+                            Up</router-link>
+                        </p>
+                      </div> -->
               </div>
             </div>
           </div>
@@ -158,14 +174,16 @@ const route = useRoute();
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
+const loginForm = computed({
+  get: () => authStore.loginForm,
+  set: (data) => authStore.loginForm = data
+});c
 
 const handleSubmit = async () => {
   // Call login and wait for it to finish
-  await authStore.login({
-    email: email.value,
-    password: password.value,
-    keepLoggedIn: keepLoggedIn.value,
-  });
+  await authStore.login(
+
+  );
 
   // If login was successful, show a snackbar message
   if (authStore.successMessage) {

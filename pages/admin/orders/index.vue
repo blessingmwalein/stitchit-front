@@ -57,15 +57,16 @@
           <template #body="slotProps">
             <div class="flex items-center">
               <!-- Using the InitialAvatar component -->
-
+  
               <div class="ml-3">
                 <div class="font-normal text-sm">{{ slotProps.data.shape }}</div>
-                <div class="font-semibold text-sm">{{ slotProps.data.length  }} x {{ slotProps.data.width }} {{ slotProps.data.unit }}</div>
+                <div class="font-semibold text-sm">{{ slotProps.data.length }} x {{ slotProps.data.width }} {{
+                  slotProps.data.unit }}</div>
               </div>
             </div>
   
           </template>
-        
+  
         </Column>
         <Column field="rug.name" header="Rug" sortable :filter="true">
           <template #body="slotProps">
@@ -105,9 +106,9 @@
         <!-- Status Column with Filter -->
         <Column field="status" header="Status" sortable :filter="true">
           <template #body="slotProps">
-            <Badge variant="light" :color="light">
-              {{ slotProps.data.status }}
-            </Badge>
+  
+            <OrderStatusBadge :status="slotProps.data.status" />
+  
           </template>
           <template #filter="{ filterModel }">
             <Dropdown v-model="filterModel.value" :options="statusOptions" placeholder="Select Status" class="w-full" />
@@ -128,8 +129,8 @@
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg>
               </Button>
-              <Button @click="handleEditOrder(slotProps.data)" variant='outline' size="sm"
-                class="p-button-rounded p-button-warning p-button-sm">
+              <Button v-if="isEditButtonVisible(slotProps.data)" @click="handleEditOrder(slotProps.data)"
+                variant='outline' size="sm" class="p-button-rounded p-button-warning p-button-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" width="20" height="20">
                   <path stroke-linecap="round" stroke-linejoin="round"
@@ -165,9 +166,19 @@
     <OrderFormModal :isOrderFormModal="isOrderFormModal" :order="selectedOrder"
       @update:isOrderFormModal="(value) => isOrderFormModal = value" />
   
+  
+    <StartProductionFormModal :isStartProductionFormModal="isStartProductionFormModal" :order="selectedOrder"
+      @update:isStartProductionFormModal="(value) => isStartProductionFormModal = value" />
+  
     <ViewOrderModal :isViewOrderModal="isViewOrderModal" :order="selectedOrder"
-      @update:isViewOrderModal="(value ) => isViewOrderModal = value"
-      @edit="isViewOrderModal = false ;handleEditRug(selectedOrder)" />
+      @update:isViewOrderModal="(value ) => isViewOrderModal = value" @processOrder="handleProcessOrder(selectedOrder)"
+      @startProduction="handleStartProduction(selectedOrder)"
+      @edit="isViewOrderModal = false; handleEditOrder(selectedOrder)" />
+  
+    <OrderTemplateModal :isViewProcessOrderModal="isViewProcessOrderModal" :order="selectedOrder"
+      @update:isViewProcessOrderModal="(value ) => isViewProcessOrderModal = value" />
+  
+  
   
     <ConfirmModal :visible="showConfirmModal" @update:visible="showConfirmModal = $event" @confirmed="handleConfirmation">
       <template #header> Delete Item </template>
@@ -200,6 +211,7 @@ import Badge from '@/components/ui/Badge.vue'
 import CustomButton from "@/components/common/buttons/CustomButton.vue";
 import OrderFormModal from '@/components/orders/modals/OrderFormModal.vue'
 import ViewOrderModal from '@/components/orders/modals/ViewOrderModal.vue'
+import OrderTemplateModal from '@/components/orders/modals/OrderTemplateModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
 
@@ -212,6 +224,9 @@ import {
 
 import { useCurrency } from '~/composables/useCurrency';
 import { useDateFormat } from '~/composables/useDateFomat';
+import StartProductionFormModal from '~/components/orders/modals/StartProductionFormModal.vue'
+import type { Order } from '~/utils/models/order'
+import OrderStatusBadge from '~/components/orders/OrderStatusBadge.vue'
 
 const { formatCurrency } = useCurrency();
 const { formatDate, formatDateString } = useDateFormat();
@@ -232,6 +247,9 @@ const selectedOrder = computed(() => ordersStore.selectedOrder);
 const isOrderFormModal = ref(false)
 const isViewOrderModal = ref(false)
 const showConfirmModal = ref(false)
+const isViewProcessOrderModal = ref(false)
+const isStartProductionFormModal = ref(false)
+
 
 
 onMounted(() => {
@@ -308,6 +326,23 @@ const handleViewOrder = (order: any) => {
   ordersStore.setSelectedOrder(order);
   isViewOrderModal.value = true;
 }
+
+const handleProcessOrder = (order: any) => {
+  isViewOrderModal.value = false;
+  ordersStore.setSelectedOrder(order);
+  isViewProcessOrderModal.value = true;
+}
+
+
+const handleStartProduction = (order: any) => {
+  isViewOrderModal.value = false;
+  ordersStore.setSelectedOrder(order);
+  isStartProductionFormModal.value = true;
+}
+
+const isEditButtonVisible = ((order: Order) => {
+  return order.status === 'Pending';
+});
 
 const handleConfirmation = async (isConfirmed: boolean) => {
   if (isConfirmed) {
