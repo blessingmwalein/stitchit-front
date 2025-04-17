@@ -51,3 +51,11 @@ export const unitsData = [
     // { value: 'in', label: 'Inches' },
     { value: 'fit', label: 'Feet' },
 ];
+
+//material units data
+export const materialUnitsData = [
+    { value: 'Gramms', label: 'Gramms' },
+    { value: 'Kg', label: 'Kg' },
+    { value: 'Litres', label: 'Litres' },  
+    { value: 'Meters', label: 'Meters' },  
+];

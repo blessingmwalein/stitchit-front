@@ -53,13 +53,13 @@
       <div class="no-scrollbar relative w-full overflow-y-auto bg-white dark:bg-gray-900">
         <!-- Image Section (no border if it's just the image) -->
         <!-- <div v-if="order?.image_url" class="mb-6 flex justify-center">
-                                <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 max-w-full"
-                                  style="max-height: 400px; max-width: 100%;">
-                                  <img :src="`${config.public.imageUrl}${order.image_url}`" alt="Order Image"
-                                    class="w-full h-auto object-cover max-h-[400px] rounded-2xl" />
-                                </div>
-                              </div>
-                         -->
+                                    <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 max-w-full"
+                                      style="max-height: 400px; max-width: 100%;">
+                                      <img :src="`${config.public.imageUrl}${order.image_url}`" alt="Order Image"
+                                        class="w-full h-auto object-cover max-h-[400px] rounded-2xl" />
+                                    </div>
+                                  </div>
+                             -->
   
         <!-- Client Information -->
         <div class="p-5 mb-6 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 relative">

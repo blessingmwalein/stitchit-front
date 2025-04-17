@@ -4,13 +4,13 @@
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
   
       <DataTable filterDisplay="row" :loading="isLoading" dataKey="id" v-model:filters="filters" sortMode="multiple"
-        paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="rugs.data" stripedRows
+        paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials.data" stripedRows
         tableStyle="min-width: 50rem" :globalFilterFields="['code', 'name', 'category']">
         <template #header>
           <div class="flex justify-between items-center">
             <!-- Button aligned to the left -->
-            <Button @click="isRugFormModal = true" variant="primary" class="p-button-rounded p-button-sm"
-              label="Add New Client" icon="pi pi-plus" to="/admin/rugs/create">
+            <Button @click="isMaterialFormModal = true" variant="primary" class="p-button-rounded p-button-sm"
+              label="Add New Client" icon="pi pi-plus" to="/admin/materials/create">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" width="20" height="20">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -39,45 +39,35 @@
   
             <div class="font-semibold text-sm">{{ slotProps.data.name }}</div>
             <div class="text-xs text-gray-400">
-              {{ slotProps.data.materials }}
+              {{ slotProps.data.brand }}
   
             </div>
   
           </template>
         </Column>
   
-        <Column field="type" header="Type">
+        <Column field="material_type_name" header="Material Type">
           <template #body="slotProps">
             <Badge variant="light" :color="light">
-              {{ slotProps.data.type }}
+              {{ slotProps.data.material_type_name }}
             </Badge>
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <CustomSelectField v-model="filterModel.value" :label="'Select type'" @change="filterCallback()" :options="[
-                                                                                                                                                  { value: 'Small', label: 'Small Text' },
-                                                                                                                                                  { value: 'Medium', label: 'Medium' },
-                                                                                                                                                  { value: 'Large', label: 'Large' }
-                                                                                                       ]"
-              :status="'error'" />
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Material Type" />
           </template>
         </Column>
   
-        <Column field="approx_cost" header="Cost">
+        <Column field="price_per_unit" header="Unit Cost">
           <template #body="slotProps">
-            <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data.approx_cost) }}</div>
+            <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data.price_per_unit) }}</div>
+            <div class="text-xs text-gray-400">
+              {{ slotProps.data.unit }}
+  
+            </div>
           </template>
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Cost" />
-          </template>
+        
         </Column>
   
-        <Column field="approx_production_cost" header="Prod Cost">
-          <template #body="slotProps">
-            <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data.approx_production_cost) }}</div>
-          </template>
-  
-  
-        </Column>
   
         <Column header="Actions">
           <template #body="slotProps">
@@ -101,8 +91,8 @@
                 </svg>
               </Button>
               <!-- Edit Button -->
-              <Button @click="showConfirmModal = true;rugsStore.setSelectedRugProfile(slotProps.data) " variant='outline'
-                size="sm" class="p-button-rounded p-button-warning p-button-sm">
+              <Button @click="showConfirmModal = true;materialStore.setSelectedMaterial(slotProps.data) "
+                variant='outline' size="sm" class="p-button-rounded p-button-warning p-button-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" width="20" height="20">
                   <path stroke-linecap="round" stroke-linejoin="round"
@@ -129,12 +119,12 @@
       </DataTable>
     </div>
   
-    <RugFormModal :isRugFormModal="isRugFormModal" :rug="selectedRug"
-      @update:isRugFormModal="(value) => isRugFormModal = value" />
+    <MaterialFormModal :isMaterialFormModal="isMaterialFormModal" :material="selectedMaterial"
+      @update:isMaterialFormModal="(value) => isMaterialFormModal = value" />
   
-    <ViewRugForm :isViewRugModal="isViewRugModal" :rug="selectedRug"
-      @update:isViewRugModal="(value ) => isViewRugModal = value"
-      @edit="isViewRugModal = false ;handleEditRug(selectedRug)" />
+    <ViewMaterialModal :isViewMaterialModal="isViewMaterialModal" :material="selectedMaterial"
+      @update:isViewMaterialModal="(value ) => isViewMaterialModal = value"
+      @edit="isViewMaterialModal = false ;handleEditRug(selectedMaterial)" />
   
     <ConfirmModal :visible="showConfirmModal" @update:visible="showConfirmModal = $event" @confirmed="handleConfirmation">
       <template #header> Delete Item </template>
@@ -143,8 +133,8 @@
   
   </admin-layout>
 </template>
-  
-  <script lang="ts" setup>
+    
+    <script lang="ts" setup>
 import {
   ref,
   onMounted
@@ -165,36 +155,34 @@ import {
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
 import CustomButton from "@/components/common/buttons/CustomButton.vue";
-import RugFormModal from '@/components/rugs/modals/RugFormModal.vue'
-import ViewRugForm from '@/components/rugs/modals/ViewRugModal.vue'
+import MaterialFormModal from '@/components/materials/modals/MaterialFormModal.vue'
+import ViewMaterialModal from '@/components/materials/modals/ViewMaterialModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
 
 import {
   FilterMatchMode
 } from '@primevue/core/api';
-import {
-  useRugStore
-} from "~/store/rugs";
 
 import { useCurrency } from '~/composables/useCurrency';
+import { useMaterialStore } from '~/store/material'
 
 const { formatCurrency } = useCurrency();
 
 
 // Store & State
-const rugsStore = useRugStore();
+const materialStore = useMaterialStore();
 const isMounted = ref(false) // Track if component has mounted
 
 const snackbar = useSnackbar();
 
-const isLoading = computed(() => rugsStore.isLoading);
-const rugs = computed(() => rugsStore.rugs);
+const isLoading = computed(() => materialStore.isLoading);
+const materials = computed(() => materialStore.materials);
 
-const selectedRug = computed(() => rugsStore.selectedRug);
+const selectedMaterial = computed(() => materialStore.selectedMaterial);
 
-const isRugFormModal = ref(false)
-const isViewRugModal = ref(false)
+const isMaterialFormModal = ref(false)
+const isViewMaterialModal = ref(false)
 const showConfirmModal = ref(false)
 
 
@@ -212,12 +200,12 @@ const filters: any = ref({
     value: null,
     matchMode: FilterMatchMode.STARTS_WITH
   },
-  approx_cost: {
+  price_per_unit: {
     value: null,
     matchMode: FilterMatchMode.EQUALS
   },
 
-  type: {
+  material_type_name: {
     value: null,
     matchMode: FilterMatchMode.EQUALS
   },
@@ -232,21 +220,21 @@ definePageMeta({
   ],
 });
 
-const currentPageTitle = ref('Rugs')
+const currentPageTitle = ref('Materials')
 
 onMounted(async () => {
-  await rugsStore.getRugs(); // Fetch only if user is not loaded
+  await materialStore.getMaterials(); // Fetch only if user is not loaded
 });
 
 //handle select client
 const handleEditRug = (client: any) => {
-  rugsStore.setSelectedRugProfile(client);
-  isRugFormModal.value = true;
+  materialStore.setSelectedMaterial(client);
+  isMaterialFormModal.value = true;
 }
 
 const handleViewRug = (client: any) => {
-  rugsStore.setSelectedRugProfile(client);
-  isViewRugModal.value = true;
+  materialStore.setSelectedMaterial(client);
+  isViewMaterialModal.value = true;
 }
 
 const handleConfirmation = async (isConfirmed: boolean) => {
@@ -255,15 +243,15 @@ const handleConfirmation = async (isConfirmed: boolean) => {
 
     // Perform the action here, e.g., delete the item
     try {
-      await rugsStore.deleteRug();
+      await materialStore.deleteMaterial();
 
-      if (rugsStore.successMessage) {
+      if (materialStore.successMessage) {
         snackbar.add({
           type: "success",
-          text: rugsStore.successMessage,
+          text: materialStore.successMessage,
         });
-        rugsStore.resetForm();// Emit success event
-        // closeModal(); // Close the modal
+        materialStore.resetForm();// Emit success event
+        closeModal(); // Close the modal
       }
     } catch (error) {
 
@@ -272,5 +260,5 @@ const handleConfirmation = async (isConfirmed: boolean) => {
     console.log("Action canceled.");
   }
 };
-  </script>
-  
+    </script>
+    

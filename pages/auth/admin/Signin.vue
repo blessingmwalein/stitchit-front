@@ -177,7 +177,7 @@ const togglePasswordVisibility = () => {
 const loginForm = computed({
   get: () => authStore.loginForm,
   set: (data) => authStore.loginForm = data
-});c
+});
 
 const handleSubmit = async () => {
   // Call login and wait for it to finish

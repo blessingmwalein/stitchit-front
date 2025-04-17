@@ -234,8 +234,12 @@ onMounted(() => {
 // });
 
 const handleViewProductionModal = (workInProgress: WorkInProgress) => {
-  productionStore.setSelectedWorkInProgress(workInProgress);
-  isViewProductionModal.value = true;
+  //   productionStore.setSelectedWorkInProgress(workInProgress);
+  //   isViewProductionModal.value = true;
+  //navigate to production view 
+  navigateTo(`/admin/production/${workInProgress.id}`);
+
+
 }
 
 const filters: any = ref({

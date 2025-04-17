@@ -47,3 +47,24 @@ export interface Link {
     label: string;
     active: boolean;
 }
+
+
+export interface WorkIProgressResponse {
+    success:  boolean;
+    message:  string;
+    response: WorkInProgress;
+}
+
+export interface UpdateWorkInProgress {
+    start_date:             Date;
+    approx_end_date:        Date;
+    status:                 string;
+    approx_production_cost: number;
+}
+
+
+export interface UpdateWorkInProgressResponse {
+    success: boolean;
+    message: string;
+    response: WorkInProgress;
+}

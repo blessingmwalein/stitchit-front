@@ -144,7 +144,7 @@ import type { WorkInProgress } from '~/utils/models/production';
 import InfoField from '~/components/orders/InfoField.vue';
 import ColorPalertView from '~/components/orders/ColorPalertView.vue';
 const { formatCurrency } = useCurrency();
-const { formatDate, formatDateString } = useDateFormat();
+const {  formatDateString } = useDateFormat();
 
 const config = useRuntimeConfig();
 
