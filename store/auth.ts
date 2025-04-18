@@ -8,16 +8,17 @@ export const useAuthStore = defineStore("auth", {
     errorMessage: null as string | null,
     errors: {} as Record<string, string>,
     isLoading: false,
+    loginForm: {} as LoginCredentials,
   }),
 
   actions: {
-    async login(credentials: LoginCredentials) {
+    async login() {
       this.isLoading = true;
       this.resetMessages();
       try {
         const { data, error } = await useFetch<AuthResponse>(getApiUrl("auth/admin/login"), {
           method: "POST",
-          body: credentials,
+          body: this.loginForm,
         });
 
         if (error.value) {
@@ -56,12 +57,45 @@ export const useAuthStore = defineStore("auth", {
           return;
         }
 
+        if (data.value) {
+          this.successMessage = data.value.message || null;
+          // return;
+        }
+
         this.user = data.value.response || null;
       } catch (err) {
         this.errorMessage = "An error occurred while fetching user data";
+        this.isLoading = false;
       } finally {
         this.isLoading = false;
       }
+    },
+
+    //setMessages
+    setMessages(response: any) {
+      if (response.errorMessage) {
+        this.errorMessage = response.errorMessage;
+      } else if (response.successMessage) {
+        this.successMessage = response.successMessage;
+      } else if (response.errors) {
+        this.errors = response.errors;
+      }
+    },
+
+    // resetMessages
+
+    resetMessages() {
+      this.successMessage = null;
+      this.errorMessage = null;
+      this.errors = {};
+    },
+
+    //reset form
+    resetForm() {
+      this.loginForm = {} as LoginCredentials;
+      this.successMessage = null;
+      this.errorMessage = null;
+      this.errors = {};
     },
   },
 

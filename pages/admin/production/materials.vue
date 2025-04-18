@@ -4,13 +4,13 @@
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
   
       <DataTable filterDisplay="row" :loading="isLoading" dataKey="id" v-model:filters="filters" sortMode="multiple"
-        paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="clients.data" stripedRows
+        paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials.data" stripedRows
         tableStyle="min-width: 50rem" :globalFilterFields="['code', 'name', 'category']">
         <template #header>
           <div class="flex justify-between items-center">
             <!-- Button aligned to the left -->
-            <Button @click="isClientFromModal = true" variant="primary" class="p-button-rounded p-button-sm"
-              label="Add New Client" icon="pi pi-plus" to="/admin/clients/create">
+            <Button @click="isMaterialFormModal = true" variant="primary" class="p-button-rounded p-button-sm"
+              label="Add New Client" icon="pi pi-plus" to="/admin/materials/create">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" width="20" height="20">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -31,80 +31,49 @@
           </div>
         </template>
   
-        <Column field="name" header="Personal">
+        <Column field="name" header="Name">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search by name" />
           </template>
           <template #body="slotProps">
-            <div class="flex items-center">
-              <!-- Using the InitialAvatar component -->
-              <InitialAvatar :name="slotProps.data.name" />
   
-              <div class="ml-3">
-                <div class="font-semibold text-sm">{{ slotProps.data.name }}</div>
-                <div class="text-xs text-gray-600">{{ slotProps.data.city }}</div>
-                <!-- Address with reduced font size and faint color -->
-                <div class="flex items-center space-x-2 text-xs text-gray-400">
-                  <MapPinIcon :height="18" :width="18" />
-                  {{ slotProps.data.address }}
+            <div class="font-semibold text-sm">{{ slotProps.data.name }}</div>
+            <div class="text-xs text-gray-400">
+              {{ slotProps.data.brand }}
   
-                </div>
-              </div>
             </div>
+  
           </template>
         </Column>
   
-        <Column field="email" header="Contact">
-          <template #body="slotProps">
-            <div class="space-y-2">
-              <!-- Phone Row -->
-              <div class="flex items-center space-x-2 text-sm  text-gray-500">
-                <!-- Phone Icon -->
-                <PhoneIcon :height="18" :width="18" />
-  
-                <span>{{ slotProps.data.phone_number }}</span>
-              </div>
-  
-              <!-- Email Row -->
-              <div class="flex items-center space-x-2 text-sm  text-gray-500">
-                <!-- Email Icon -->
-                <EmailAtIcon :height="18" :width="18" />
-                <span>{{ slotProps.data.email }}</span>
-              </div>
-            </div>
-          </template>
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-              placeholder="Search by contact" />
-          </template>
-        </Column>
-  
-        <!-- <Column field="gender" header="Gender">
-                                                        <template #filter="{ filterModel, filterCallback }">
-                                                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search by category" />
-                                                        </template>
-                                                    </Column> -->
-        <Column field="gender" sortable header="Gender">
-          <!-- filter selecto -->
-          <template #filter="{ filterModel, filterCallback }">
-            <CustomSelectField v-model="filterModel.value" :label="'Select an option'" :options="[
-                                                                    { value: 'male', label: 'Male' },
-                                                                    { value: 'female', label: 'Femail' },
-                                                                    { value: 'other', label: 'Other' }
-                                                                ]" :status="'error'" />
-  
-          </template>
+        <Column field="material_type_name" header="Material Type">
           <template #body="slotProps">
             <Badge variant="light" :color="light">
-              {{ slotProps.data.gender }}
+              {{ slotProps.data.material_type_name }}
             </Badge>
           </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Material Type" />
+          </template>
         </Column>
+  
+        <Column field="price_per_unit" header="Unit Cost">
+          <template #body="slotProps">
+            <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data.price_per_unit) }}</div>
+            <div class="text-xs text-gray-400">
+              {{ slotProps.data.unit }}
+  
+            </div>
+          </template>
+        
+        </Column>
+  
+  
         <Column header="Actions">
           <template #body="slotProps">
             <div class="flex space-x-2">
               <!-- View Button -->
-              <Button @click="handleViewClient(slotProps.data)" variant='outline' size='sm'
+              <Button @click="handleViewRug(slotProps.data)" variant='outline' size='sm'
                 class="p-button-rounded p-button-warning p-button-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" width="20" height="20">
@@ -113,7 +82,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg>
               </Button>
-              <Button @click="handleEditClient(slotProps.data)" variant='outline' size="sm"
+              <Button @click="handleEditRug(slotProps.data)" variant='outline' size="sm"
                 class="p-button-rounded p-button-warning p-button-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" width="20" height="20">
@@ -122,7 +91,7 @@
                 </svg>
               </Button>
               <!-- Edit Button -->
-              <Button @click="showConfirmModal = true;clientStore.setSelectedClientProfile(slotProps.data) "
+              <Button @click="showConfirmModal = true;materialStore.setSelectedMaterial(slotProps.data) "
                 variant='outline' size="sm" class="p-button-rounded p-button-warning p-button-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" width="20" height="20">
@@ -145,17 +114,17 @@
             <p class="mt-4 text-lg font-semibold">No items found</p>
             <p class="text-sm text-gray-400">Try adding new items to see them here.</p>
           </div>
-</template>
-
+        </template>
+  
       </DataTable>
     </div>
   
-    <ClientFormModal :isClientFromModal="isClientFromModal" :clientProfile="selectedClientProfile"
-      @update:isClientFromModal="(value) => isClientFromModal = value" />
+    <MaterialFormModal :isMaterialFormModal="isMaterialFormModal" :material="selectedMaterial"
+      @update:isMaterialFormModal="(value) => isMaterialFormModal = value" />
   
-    <ViewClientForm :isViewClientModal="isViewClientModal" :clientProfile="selectedClientProfile"
-      @update:isViewClientModal="(value ) => isViewClientModal = value"
-      @edit="isViewClientModal = false ;handleEditClient(selectedClientProfile)" />
+    <ViewMaterialModal :isViewMaterialModal="isViewMaterialModal" :material="selectedMaterial"
+      @update:isViewMaterialModal="(value ) => isViewMaterialModal = value"
+      @edit="isViewMaterialModal = false ;handleEditRug(selectedMaterial)" />
   
     <ConfirmModal :visible="showConfirmModal" @update:visible="showConfirmModal = $event" @confirmed="handleConfirmation">
       <template #header> Delete Item </template>
@@ -164,8 +133,8 @@
   
   </admin-layout>
 </template>
-
-<script lang="ts" setup>
+    
+    <script lang="ts" setup>
 import {
   ref,
   onMounted
@@ -186,31 +155,34 @@ import {
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
 import CustomButton from "@/components/common/buttons/CustomButton.vue";
-import ClientFormModal from '@/components/clients/modals/ClientFormModal.vue'
-import ViewClientForm from '@/components/clients/modals/ViewClientModal.vue'
+import MaterialFormModal from '@/components/materials/modals/MaterialFormModal.vue'
+import ViewMaterialModal from '@/components/materials/modals/ViewMaterialModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
 
 import {
   FilterMatchMode
 } from '@primevue/core/api';
-import {
-  useClientsStore
-} from "~/store/client";
+
+import { useCurrency } from '~/composables/useCurrency';
+import { useMaterialStore } from '~/store/material'
+
+const { formatCurrency } = useCurrency();
+
 
 // Store & State
-const clientStore = useClientsStore();
+const materialStore = useMaterialStore();
 const isMounted = ref(false) // Track if component has mounted
 
 const snackbar = useSnackbar();
 
-const isLoading = computed(() => clientStore.isLoading);
-const clients = computed(() => clientStore.clients);
+const isLoading = computed(() => materialStore.isLoading);
+const materials = computed(() => materialStore.materials);
 
-const selectedClientProfile = computed(() => clientStore.selectedClientProfile);
+const selectedMaterial = computed(() => materialStore.selectedMaterial);
 
-const isClientFromModal = ref(false)
-const isViewClientModal = ref(false)
+const isMaterialFormModal = ref(false)
+const isViewMaterialModal = ref(false)
 const showConfirmModal = ref(false)
 
 
@@ -223,19 +195,17 @@ const filters: any = ref({
     value: null,
     matchMode: FilterMatchMode.CONTAINS
   },
-  email: {
-    value: null,
-    matchMode: FilterMatchMode.CONTAINS
-  },
+
   name: {
     value: null,
     matchMode: FilterMatchMode.STARTS_WITH
   },
-  phone_number: {
+  price_per_unit: {
     value: null,
-    matchMode: FilterMatchMode.STARTS_WITH
+    matchMode: FilterMatchMode.EQUALS
   },
-  gender: {
+
+  material_type_name: {
     value: null,
     matchMode: FilterMatchMode.EQUALS
   },
@@ -250,22 +220,21 @@ definePageMeta({
   ],
 });
 
-const currentPageTitle = ref('Clients')
+const currentPageTitle = ref('Materials')
 
 onMounted(async () => {
-  await clientStore.getClients(); // Fetch only if user is not loaded
-
+  await materialStore.getMaterials(); // Fetch only if user is not loaded
 });
 
 //handle select client
-const handleEditClient = (client: any) => {
-  clientStore.setSelectedClientProfile(client);
-  isClientFromModal.value = true;
+const handleEditRug = (client: any) => {
+  materialStore.setSelectedMaterial(client);
+  isMaterialFormModal.value = true;
 }
 
-const handleViewClient = (client: any) => {
-  clientStore.setSelectedClientProfile(client);
-  isViewClientModal.value = true;
+const handleViewRug = (client: any) => {
+  materialStore.setSelectedMaterial(client);
+  isViewMaterialModal.value = true;
 }
 
 const handleConfirmation = async (isConfirmed: boolean) => {
@@ -274,14 +243,14 @@ const handleConfirmation = async (isConfirmed: boolean) => {
 
     // Perform the action here, e.g., delete the item
     try {
-      await clientStore.deleteClient();
+      await materialStore.deleteMaterial();
 
-      if (clientStore.successMessage) {
+      if (materialStore.successMessage) {
         snackbar.add({
           type: "success",
-          text: clientStore.successMessage,
+          text: materialStore.successMessage,
         });
-        clientStore.resetForm();// Emit success event
+        materialStore.resetForm();// Emit success event
         closeModal(); // Close the modal
       }
     } catch (error) {
@@ -291,4 +260,5 @@ const handleConfirmation = async (isConfirmed: boolean) => {
     console.log("Action canceled.");
   }
 };
-</script>
+    </script>
+    

@@ -7,6 +7,15 @@ export interface CreateClientRequest {
     city: string;
     role: string;
 }
+export interface SearchClientRequest {
+    name: string;
+    email: string;
+    gender: string;
+    phone_number: string;
+    address: string;
+}
+
+
 
 
 

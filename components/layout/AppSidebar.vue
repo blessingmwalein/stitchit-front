@@ -216,7 +216,7 @@ const menuGroups = [
       {
         icon: PendingIcon,
         name: "In Progress",
-        path: "/admin/production/in-progress",
+        path: "/admin/production",
       },
       {
         icon: BoxCubeIcon,

@@ -1,5 +1,5 @@
 import type { AuthResponse, LoginCredentials, User } from "~/utils/models/auth";
-import type { ClientData, ClientsResponse, CreateClientRequest, CreateClientResponse, UserClient } from "~/utils/models/client";
+import type { ClientData, ClientsResponse, CreateClientRequest, CreateClientResponse, SearchClientRequest, UserClient } from "~/utils/models/client";
 
 export const useClientsStore = defineStore("client", {
   state: () => ({
@@ -11,6 +11,7 @@ export const useClientsStore = defineStore("client", {
     isLoading: false,
     user: null as User | null,  // Add user to the state
     createClientForm: {} as CreateClientRequest,  // Add createClientForm to the state
+    clientSearchForm: {} as SearchClientRequest,  // Add clientSearchForm to the state
     selectedClientProfile: null as UserClient | null,  // Add selectedClientProfile to the state
   }),
 
@@ -24,7 +25,7 @@ export const useClientsStore = defineStore("client", {
           method: "POST",
           body: {
             ...this.createClientForm,
-            role: "Client",  // Explicitly set the role here
+            role: "client",  // Explicitly set the role here
             // Spread the rest of the fields
           },
           headers: { Authorization: `Bearer ${this.token}` },
@@ -150,6 +151,41 @@ export const useClientsStore = defineStore("client", {
       //set state form with selected client data
       this.createClientForm = client
 
+    },
+
+    //search client {{baseUrl}}/client/clients?email=blessingmwalein@gmail.com&name=blessing&phone_number=+0772440088
+
+    async searchClients() {
+      this.isLoading = true;
+      if (!this.token) return;
+      try {
+        const response = await $fetch<ClientsResponse>(getApiUrl(
+          `client/clients?${this.convertSearchFormToQueryString()}`
+        ), {
+          headers: { Authorization: `Bearer ${this.token}` },
+        });
+
+        if (response?.response) {
+          this.clients = response.response;  // Assuming the response contains a 'clients' array
+          console.log("Clients data:", this.clients);
+        }
+      } catch (err) {
+        console.error("Error fetching clients:", err);
+        this.errorMessage = "An error occurred while fetching client data";
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    //convert search form to query string
+    convertSearchFormToQueryString() {
+      const params = new URLSearchParams();
+      for (const key in this.clientSearchForm) {
+        if (this.clientSearchForm[key]) {
+          params.append(key, this.clientSearchForm[key]);
+        }
+      }
+      return params.toString();
     },
   },
 

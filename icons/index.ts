@@ -53,7 +53,8 @@ import LockIcon from "./LockIcon.vue";
 import EmailAtIcon from "./EmailAtIcon.vue";
 import PhoneIcon from "./PhoneIcon.vue";
 import MapPinIcon from "./MapPinIcon.vue";
-
+import ArrrowUTurn from "./ArrrowUTurnIcon.vue";
+import PencilIcon from "./PencilIcon.vue";
 export {
   BellIcon,
   BarChartIcon,
@@ -110,4 +111,6 @@ export {
   EmailAtIcon,
   PhoneIcon,
   MapPinIcon,
+  ArrrowUTurn,
+  PencilIcon,
 };
