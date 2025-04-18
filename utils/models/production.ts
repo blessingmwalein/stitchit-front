@@ -1,3 +1,4 @@
+import type { Material } from "./materials";
 import type { Order } from "./order";
 
 export interface WorkInProgressResponse {
@@ -50,15 +51,15 @@ export interface Link {
 
 
 export interface WorkIProgressResponse {
-    success:  boolean;
-    message:  string;
+    success: boolean;
+    message: string;
     response: WorkInProgress;
 }
 
 export interface UpdateWorkInProgress {
-    start_date:             Date;
-    approx_end_date:        Date;
-    status:                 string;
+    start_date: Date;
+    approx_end_date: Date;
+    status: string;
     approx_production_cost: number;
 }
 
@@ -67,4 +68,31 @@ export interface UpdateWorkInProgressResponse {
     success: boolean;
     message: string;
     response: WorkInProgress;
+}
+
+
+export interface WorkInProgressMaterialResponse {
+    success: boolean;
+    message: string;
+    response: WorkInProgressMaterial[];
+}
+
+export interface WorkInProgressMaterial {
+    id: number;
+    material_id: number;
+    quantity: number;
+    description: string;
+    work_in_progress_id: number;
+    created_at: Date;
+    updated_at: Date;
+    material: Material;
+}
+
+
+export interface AddWorkInProgressMaterialRequest {
+    material_id: number;
+    quantity: number;
+    description: string;
+    id: number | null
+    // work_in_progress_id: number;
 }

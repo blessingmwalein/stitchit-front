@@ -25,18 +25,18 @@
             </CustomButton>
           </div>
           <!-- <CustomButton @click="" type="submit" label="Allocate Materials" variant="brand" rounded="full"
-                                    :isLoading="false" :prefixIcon="true" :disabled="false" class="w-full">
-                                    <template #prefix>
-                                      <PlusIcon />
-                                    </template>
-                                  </CustomButton>
-                          
-                                  <CustomButton @click="" type="submit" label="Update Status" variant="warning" rounded="full" :isLoading="false"
-                                    :prefixIcon="true" :disabled="false" class="w-full">
-                                    <template #prefix>
-                                      <ArrrowUTurnIcon />
-                                    </template>
-                                  </CustomButton> -->
+                                                                                                                                                  :isLoading="false" :prefixIcon="true" :disabled="false" class="w-full">
+                                                                                                                                                  <template #prefix>
+                                                                                                                                                    <PlusIcon />
+                                                                                                                                                  </template>
+                                                                                                                                                </CustomButton>
+                                                                                                                                        
+                                                                                                                                                <CustomButton @click="" type="submit" label="Update Status" variant="warning" rounded="full" :isLoading="false"
+                                                                                                                                                  :prefixIcon="true" :disabled="false" class="w-full">
+                                                                                                                                                  <template #prefix>
+                                                                                                                                                    <ArrrowUTurnIcon />
+                                                                                                                                                  </template>
+                                                                                                                                                </CustomButton> -->
   
         </div>
       </div>
@@ -155,6 +155,108 @@
             </div>
           </TabPanel>
   
+          <TabPanel value="4">
+            <DataTable v-model:editingRows="editingRows" :loading="isLoading" editMode="row" dataKey="id" paginator
+              :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials" stripedRows tableStyle="min-width: 50rem"
+              @row-edit-save="onRowEditSave" :pt="{
+                                                                                                            table: { style: 'min-width: 50rem' },
+                                                                                                            column: {
+                                                                                                                bodycell: ({ state }) => ({
+                                                                                                                    style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
+                                                                                                                })
+                                                                                                            }
+                                                                                                        }">
+              <template #header>
+                <div class="flex justify-between items-center" v-if="!isProductionDone">
+                  <!-- Button aligned to the left -->
+                  <Button @click="addNewMaterial" variant="primary" class="p-button-rounded p-button-sm" label="Add Row"
+                    icon="pi pi-plus">
+                    Add Row
+                  </Button>
+                  <Button @click="save" variant="outline" class="p-button-rounded p-button-sm" label="Add Row"
+                    icon="pi pi-plus">
+                    Save
+                  </Button>
+  
+                  <!-- Search input aligned to the right -->
+                </div>
+              </template>
+  
+              <Column field="material_id" header="Name">
+  
+                <template #body="slotProps">
+  
+                  <div class="font-semibold text-sm">{{ slotProps.data.material?.name }}</div>
+  
+                  <div class="text-xs text-gray-400">
+                    {{ slotProps.data.material.material_type_name }}
+  
+                  </div>
+  
+                </template>
+  
+                <template #editor="{ data, field }">
+                  <!-- <InputText v-model="data[field]" fluid /> -->
+                  <Select v-model="data[field]"
+                    :options="materialsOption.data.map(material=> ({ value:material.id, label:material.name}))"
+                    optionLabel="label" optionValue="value" placeholder="Select a material" fluid>
+  
+                  </Select>
+  
+                </template>
+              </Column>
+  
+              <Column field="description" header="Description">
+                <template #body="slotProps">
+                  <div class="text-xs text-gray-400">
+                    <!-- {{ slotProps.data.description }} -->
+                    <Badge variant="light" :color="light">
+                      {{ slotProps.data.description}}
+                    </Badge>
+                  </div>
+                </template>
+                <template #editor="{ data, field }">
+                  <InputText v-model="data[field]" fluid />
+                </template>
+  
+              </Column>
+  
+              <Column field="price_per_unit" header="Unit Cost">
+                <template #body="slotProps">
+                  <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data?.material?.price_per_unit) }}
+                    {{slotProps.data?.material?.unit}}</div>
+                </template>
+  
+              </Column>
+  
+              <Column field="quantity" header="Quantity">
+                <template #body="slotProps">
+                  <div class="font-semibold text-sm">{{ slotProps.data?.quantity }}</div>
+                </template>
+  
+                <template #editor="{ data, field }">
+                  <InputNumber v-model="data[field]" fluid />
+                </template>
+  
+              </Column>
+  
+              <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+              <template #empty>
+                <div class="flex flex-col items-center justify-center py-10 text-gray-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                  </svg>
+  
+                  <p class="mt-4 text-lg font-semibold">No materials found</p>
+                  <p class="text-sm text-gray-400">Try allocating materials.</p>
+                </div>
+              </template>
+  
+            </DataTable>
+          </TabPanel>
+  
         </TabPanels>
       </Tabs>
     </div>
@@ -191,7 +293,11 @@ import CustomButton from '~/components/common/buttons/CustomButton.vue'
 import PlusIcon from '~/icons/PlusIcon.vue'
 import ArrrowUTurnIcon from '~/icons/ArrrowUTurnIcon.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
-import type { UpdateWorkInProgress } from '~/utils/models/production'
+import type { AddWorkInProgressMaterialRequest, UpdateWorkInProgress } from '~/utils/models/production'
+import Button from '@/components/ui/Button.vue'
+import Badge from '@/components/ui/Badge.vue'
+import { useMaterialStore } from '~/store/material'
+import type { Material } from '~/utils/models/materials'
 
 
 const { formatCurrency } = useCurrency();
@@ -200,6 +306,9 @@ const { formatDateString } = useDateFormat();
 // Store & State
 const authStore = useAuthStore();
 const snackbar = useSnackbar();
+const productionStore = useProductionStore();
+const materialsStore = useMaterialStore();
+
 
 const isMounted = ref(false) // Track if component has mounted
 
@@ -209,15 +318,63 @@ const showConfirmUpdateStatus = ref(false)
 const nextStatus = ref();
 
 
+
 const config = useRuntimeConfig();
 const updateWorkInProgressForm = computed({
   get: () => productionStore.updateWorkInProgressForm,
   set: (data: UpdateWorkInProgress) => productionStore.updateWorkInProgressForm = data
 })
 
+const materialsForm = computed({
+  get: () => productionStore.materialsForm,
+  set: (data: AddWorkInProgressMaterialRequest[]) => productionStore.materialsForm = data
+})
+
+
+const updateMaterialsForm = computed({
+  get: () => productionStore.updateMaterialsForm,
+  set: (data: AddWorkInProgressMaterialRequest[]) => productionStore.updateMaterialsForm = data
+})
+
+const materials = computed(() => productionStore.materials);
+
+//get material by id
+const getMaterialById = (id: number) => {
+  return materialsStore.materials.data.find(m => m.id === id);
+};
+
+const materialsOption = computed(() => materialsStore.materials);
+const isProductionDone = computed(() => productionStore.selectedWorkInProgress.status === 'Done')
+
+const addedRows = ref([]);
+const updatedRows = ref([]);
+
+const onRowEditSave = (event: any) => {
+  let { newData, index } = event;
+
+  const updatedMaterial = {
+    ...newData,
+    material: {
+      name: getMaterialById(newData.material_id)?.name || "",
+      brand: getMaterialById(newData.material_id)?.brand || "",
+      material_type_name: getMaterialById(newData.material_id)?.material_type_name || "",
+      price_per_unit: getMaterialById(newData.material_id)?.price_per_unit || 0,
+      unit: getMaterialById(newData.material_id)?.unit || 0
+    }
+  };
+
+  materials.value[index] = updatedMaterial;
+  newData.id != null ? updateMaterialsForm.value[index] = newData
+    : materialsForm.value[index] = newData
+
+
+
+};
+
+
+const editingRows = ref([]);
 
 const workInProgress = computed(() => productionStore.selectedWorkInProgress)
-const productionStore = useProductionStore();
 const route = useRoute()
 onMounted(() => {
   isMounted.value = true // Set to true once component is mounted
@@ -241,6 +398,25 @@ const getNextStatusOptions = (currentStatus: string) => {
   return transitions[currentStatus] || [];
 };
 
+const addNewMaterial = () => {
+  const newMaterial: any = {
+    id: null,
+    material: {
+      name: "",
+      brand: "",
+      material_type_name: "",
+      price_per_unit: 0,
+      unit: ""
+    },
+    description: "",
+    material_id: null,
+    quantity: 0,
+    // you can use this to detect new rows later if needed
+  };
+  materials.value.push(newMaterial);
+  editingRows.value.push(newMaterial.id); // optionally start editing the row immediately
+};
+
 const currentPageTitle = ref('User Profile')
 
 onMounted(async () => {
@@ -248,23 +424,21 @@ onMounted(async () => {
   const id = route.params.id
   if (id) {
     await productionStore.getSingleWorkInProgress(id)
+    await productionStore.getMaterials(id)
+    await materialsStore.getMaterials(id)
   }
 });
 
 
 
 const setNextStatus = (status: string) => {
-
   productionStore.updateFormStatus(status);
-
 }
 
 const handleConfirmation = async (isConfirmed: boolean) => {
   if (isConfirmed) {
     try {
       await productionStore.updateProduction();
-
-
       if (productionStore.successMessage) {
         snackbar.add({
           type: "success",
@@ -272,11 +446,41 @@ const handleConfirmation = async (isConfirmed: boolean) => {
         });// Emit success event
         // closeModal(); // Close the modal
       }
+
+      console.log(productionStore.errorMessage);
+      if (productionStore.errorMessage) {
+        snackbar.add({
+          type: "error",
+          text: productionStore.errorMessage,
+        });// Emit success event
+        // closeModal(); // Close the modal
+      }
+
     } catch (error) {
+      console.log('Error 2')
 
     }
   } else {
     console.log("Action canceled.");
   }
 };
+
+const save = async () => {
+  const id = route.params.id
+  try {
+    // await productionStore.addMaterials(id)
+    await productionStore.submitMaterials(id);
+    if (productionStore.successMessage) {
+      await productionStore.getMaterials(id)
+      snackbar.add({
+        type: "success",
+        text: productionStore.successMessage,
+      });// Emit success event
+      // closeModal(); // Close the modal
+    }
+  } catch (error) {
+
+  }
+}
+
 </script>
