@@ -172,6 +172,7 @@ import {
   UsersIcon,
   LockIcon,
   PendingIcon,
+  CheckBadge
 } from "../../icons";
 import SidebarWidget from "./SidebarWidget.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
@@ -215,7 +216,12 @@ const menuGroups = [
     items: [
       {
         icon: PendingIcon,
-        name: "In Progress",
+        name: "Work",
+        path: "/admin/production",
+      },
+      {
+        icon: CheckBadge,
+        name: "Finished",
         path: "/admin/production",
       },
       {

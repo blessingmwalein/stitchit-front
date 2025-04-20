@@ -17,7 +17,7 @@
         <div class="flex gap-2 ">
           <div v-for="nextStatus in getNextStatusOptions(workInProgress?.status)" :key="nextStatus">
             <CustomButton class="w-full" :label="`Change to ${nextStatus}`"
-              @click="setNextStatus(nextStatus); showConfirmUpdateStatus = true" variant="brand" rounded="full">
+              @click="setNextStatus(nextStatus); changeStatus()" variant="brand" rounded="full">
   
               <template #prefix>
                 <ArrrowUTurnIcon />
@@ -25,18 +25,18 @@
             </CustomButton>
           </div>
           <!-- <CustomButton @click="" type="submit" label="Allocate Materials" variant="brand" rounded="full"
-                                                                                                                                                  :isLoading="false" :prefixIcon="true" :disabled="false" class="w-full">
-                                                                                                                                                  <template #prefix>
-                                                                                                                                                    <PlusIcon />
-                                                                                                                                                  </template>
-                                                                                                                                                </CustomButton>
-                                                                                                                                        
-                                                                                                                                                <CustomButton @click="" type="submit" label="Update Status" variant="warning" rounded="full" :isLoading="false"
-                                                                                                                                                  :prefixIcon="true" :disabled="false" class="w-full">
-                                                                                                                                                  <template #prefix>
-                                                                                                                                                    <ArrrowUTurnIcon />
-                                                                                                                                                  </template>
-                                                                                                                                                </CustomButton> -->
+                                                                                                                                                                        :isLoading="false" :prefixIcon="true" :disabled="false" class="w-full">
+                                                                                                                                                                        <template #prefix>
+                                                                                                                                                                          <PlusIcon />
+                                                                                                                                                                        </template>
+                                                                                                                                                                      </CustomButton>
+                                                                                                                                                              
+                                                                                                                                                                      <CustomButton @click="" type="submit" label="Update Status" variant="warning" rounded="full" :isLoading="false"
+                                                                                                                                                                        :prefixIcon="true" :disabled="false" class="w-full">
+                                                                                                                                                                        <template #prefix>
+                                                                                                                                                                          <ArrrowUTurnIcon />
+                                                                                                                                                                        </template>
+                                                                                                                                                                      </CustomButton> -->
   
         </div>
       </div>
@@ -71,6 +71,18 @@
             <span class="inline-flex items-center gap-2">
               <BoxCubeIcon />
               Raw Materials
+            </span>
+          </Tab>
+          <Tab value="5">
+            <span class="inline-flex items-center gap-2">
+              <BoxCubeIcon />
+              Product
+            </span>
+          </Tab>
+          <Tab value="6">
+            <span class="inline-flex items-center gap-2">
+              <ClipBoardIcon />
+              Summary
             </span>
           </Tab>
         </TabList>
@@ -158,14 +170,15 @@
           <TabPanel value="4">
             <DataTable v-model:editingRows="editingRows" :loading="isLoading" editMode="row" dataKey="id" paginator
               :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials" stripedRows tableStyle="min-width: 50rem"
-              @row-edit-save="onRowEditSave" :pt="{
-                                                                                                            table: { style: 'min-width: 50rem' },
-                                                                                                            column: {
-                                                                                                                bodycell: ({ state }) => ({
-                                                                                                                    style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
-                                                                                                                })
-                                                                                                            }
-                                                                                                        }">
+              @row-edit-save="onRowEditSave"
+              :pt="{
+                                                                                                                                  table: { style: 'min-width: 50rem' },
+                                                                                                                                  column: {
+                                                                                                                                      bodycell: ({ state }) => ({
+                                                                                                                                          style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
+                                                                                                                                      })
+                                                                                                                                  }
+                                                                                                                              }">
               <template #header>
                 <div class="flex justify-between items-center" v-if="!isProductionDone">
                   <!-- Button aligned to the left -->
@@ -256,6 +269,135 @@
   
             </DataTable>
           </TabPanel>
+          <TabPanel value="5">
+            <div class="flex-col md:flex-row justify-between flex gap-4 items-start mx-4 py-12">
+              <div class="flex bg-white rounded-lg shadow dark:bg-gray-800 flex-col md:flex-row">
+                <div class="relative w-full md:w-48 flex justify-center items-center">
+                  <img src="https://cdn.pixabay.com/photo/2013/07/13/14/07/apparel-162180_960_720.png"
+                    alt="shopping image"
+                    class="object-cover w-full h-48 md:h-full rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                </div>
+                <form class="flex-auto p-6">
+                  <div class="flex flex-wrap">
+                    <h1 class="flex-auto text-xl font-semibold dark:text-gray-50">Product name</h1>
+                    <div class="text-xl font-semibold text-gray-500 dark:text-gray-300">$110.00</div>
+                    <div class="flex-none w-full mt-2 text-sm font-medium text-gray-500 dark:text-gray-300">In stock</div>
+                  </div>
+                  <div class="flex items-baseline mt-4 mb-6 text-gray-700 dark:text-gray-300">
+                    <div class="flex space-x-2">
+  
+                      <label class="text-center">
+  
+                        <input type="radio"
+                          class="flex items-center justify-center w-6 h-6 accent-violet-600 bg-gray-100 rounded-lg dark:bg-gray-600"
+                          name="size" value="xs">XS
+                      </label>
+                      <label class="text-center">
+                        <input type="radio" class="flex items-center justify-center w-6 h-6 accent-violet-600" name="size"
+                          value="s">S
+                      </label>
+                      <label class="text-center">
+                        <input type="radio" class="flex items-center justify-center w-6 h-6 accent-violet-600" name="size"
+                          value="m">M
+                      </label>
+                      <label class="text-center">
+                        <input type="radio" class="flex items-center justify-center w-6 h-6 accent-violet-600" name="size"
+                          value="l">L
+                      </label>
+                      <label class="text-center">
+                        <input type="radio" class="flex items-center justify-center w-6 h-6 accent-violet-600" name="size"
+                          value="xl">XL
+                      </label>
+                    </div>
+                    <a href="#" class="hidden ml-auto text-sm text-gray-500 underline md:block dark:text-gray-300">Size
+                      Guide
+                    </a>
+                  </div>
+                  <div class="flex mb-4 text-sm font-medium">
+                    <button type="button"
+                      class="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg ">Buy
+                      now</button>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-300">Free shipping on all continental US orders.</p>
+                </form>
+              </div>
+            </div>
+          </TabPanel>
+  
+          <TabPanel value="6">
+            <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+              <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Summary</h4>
+  
+              <!-- Overall Material Cost -->
+              <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h5 class="text-lg font-semibold text-gray-800 dark:text-white">Material Usage Summary</h5>
+                  <div class="text-right text-xl font-semibold text-gray-700 dark:text-gray-100">
+                    ${{ overallMaterialCost.toFixed(2) }}
+                  </div>
+                </div>
+  
+                <!-- Accordion for Material Groups -->
+                <Accordion :value="activeGroupIndex">
+                  <AccordionPanel v-for="(group, index) in groupedMaterials" :key="group.type" :value="index">
+                    <AccordionHeader>
+                      {{ group.type }}
+                    </AccordionHeader>
+                    <AccordionContent>
+                      <table class="min-w-full text-sm text-left text-gray-600 dark:text-gray-300">
+                        <thead class="border-b border-gray-300 dark:border-gray-700 text-xs uppercase font-medium">
+                          <tr>
+                            <th class="py-1 pr-3">Material</th>
+                            <th class="py-1 pr-3">Description</th>
+                            <th class="py-1 pr-3">Qty</th>
+                            <th class="py-1 pr-3">Unit</th>
+                            <th class="py-1 pr-3">Unit Cost</th>
+                            <th class="py-1 pr-3">Subtotal</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="item in group.items" :key="item.name + item.description"
+                            class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-1 pr-3">{{ item.name }}</td>
+                            <td class="py-1 pr-3">{{ item.description }}</td>
+                            <td class="py-1 pr-3">{{ item.quantity }}</td>
+                            <td class="py-1 pr-3">{{ item.unit }}</td>
+                            <td class="py-1 pr-3">{{ formatCurrency(item.unitCost) }}</td>
+                            <td class="py-1 pr-3">{{ formatCurrency(item.cost) }}</td>
+                          </tr>
+                          <tr class="font-semibold">
+  
+                            <td colspan="5" class="text-right py-2 pr-3">Total</td>
+                            <td class="py-2 pr-3">{{ formatCurrency(group.totalCost) }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </AccordionContent>
+                  </AccordionPanel>
+                </Accordion>
+              </div>
+  
+              <!-- Additional Production Summary -->
+              <div class="border-t pt-4 mt-6">
+                <h5 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Production Summary</h5>
+                <div class="space-y-2 text-sm text-gray-700 dark:text-gray-200">
+                  <div class="flex justify-between text-xl">
+                    <span>Total Production Hours:</span>
+                    <span>{{ workInProgress.total_hours }} hrs</span>
+                  </div>
+                  <div class="flex justify-between text-xl">
+                    <span>Total Labour Cost:</span>
+                    <span>{{ formatCurrency(workInProgress.labour_cost) }}</span>
+                  </div>
+                  <div class="flex justify-between font-semibold border-t pt-2 text-xl">
+                    <span>Total Production Cost:</span>
+                    <span>{{ formatCurrency(workInProgress.actual_production_cost) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabPanel>
+  
   
         </TabPanels>
       </Tabs>
@@ -267,6 +409,10 @@
       <template #header> Update Status </template>
       <template #body> Are you sure you want to update this production to {{updateWorkInProgressForm.status}}? </template>
     </ConfirmModal>
+  
+    <DoneProductionModal :isDoneProductionModal="isDoneProductionModal" :workInProgress="workInProgress"
+      @update:isDoneProductionModal="(value) => isDoneProductionModal = value" />
+  
   </admin-layout>
 </template>
 
@@ -288,11 +434,13 @@ import ShopIcon from '~/icons/ShopIcon.vue'
 import UsersIcon from '~/icons/UsersIcon.vue'
 import ShopBag from '~/icons/ShopBag.vue'
 import BoxCubeIcon from '~/icons/BoxCubeIcon.vue'
+import ClipBoardIcon from '~/icons/ClipBoardIcon.vue'
 import { ProductionStatusBadge } from '#components'
 import CustomButton from '~/components/common/buttons/CustomButton.vue'
 import PlusIcon from '~/icons/PlusIcon.vue'
 import ArrrowUTurnIcon from '~/icons/ArrrowUTurnIcon.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
+import DoneProductionModal from '@/components/production/modals/DoneProductionModal.vue'
 import type { AddWorkInProgressMaterialRequest, UpdateWorkInProgress } from '~/utils/models/production'
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
@@ -315,8 +463,8 @@ const isMounted = ref(false) // Track if component has mounted
 const isLoading = computed(() => authStore.isLoading);
 const userProfile = computed(() => authStore.user);
 const showConfirmUpdateStatus = ref(false)
+const isDoneProductionModal = ref(false)
 const nextStatus = ref();
-
 
 
 const config = useRuntimeConfig();
@@ -433,6 +581,7 @@ onMounted(async () => {
 
 const setNextStatus = (status: string) => {
   productionStore.updateFormStatus(status);
+  nextStatus.value = status;
 }
 
 const handleConfirmation = async (isConfirmed: boolean) => {
@@ -465,6 +614,14 @@ const handleConfirmation = async (isConfirmed: boolean) => {
   }
 };
 
+const changeStatus = () => {
+  console.log(nextStatus.value);
+  if (nextStatus.value === 'Done') {
+    isDoneProductionModal.value = true
+  } else {
+    showConfirmUpdateStatus.value = true
+  }
+}
 const save = async () => {
   const id = route.params.id
   try {
@@ -482,5 +639,43 @@ const save = async () => {
 
   }
 }
+
+const groupedMaterials = computed(() => {
+  const result: Record<string, any> = {};
+
+  productionStore.materials.forEach(entry => {
+    const item = entry;
+    const type = item.material.material_type_name;
+    const unitCost = item.material.price_per_unit;
+    const quantity = item.quantity;
+    const cost = unitCost * quantity;
+
+    if (!result[type]) {
+      result[type] = {
+        type: type,
+        items: [],
+        totalCost: 0,
+      };
+    }
+
+    result[type].items.push({
+      name: item.material.name,
+      quantity,
+      unit: item.material.unit,
+      unitCost,
+      cost,
+      description: item.description,
+    });
+
+    result[type].totalCost += cost;
+  });
+
+  return Object.values(result);
+});
+
+const overallMaterialCost = computed(() =>
+  groupedMaterials.value.reduce((sum, group) => sum + group.totalCost, 0)
+);
+
 
 </script>
