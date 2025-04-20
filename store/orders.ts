@@ -39,16 +39,6 @@ export const useOrderStore = defineStore("order", {
                 formData.append("shape", this.createOrderForm.shape);
 
 
-
-                // Object.entries(this.createOrderForm).forEach(([key, value]) => {
-                //     if (value) {
-                //         formData.append(key, value);
-                //     }
-                // });
-
-                // Append image file if exists
-                console.log("Image file:", this.orderImage);
-
                 if (this.orderImage) {
                     formData.append("image", this.orderImage as File);
                 }
@@ -65,7 +55,7 @@ export const useOrderStore = defineStore("order", {
 
                 if (response?.response) {
                     console.log("Order created successfully:", response.response);
-                    this.orders.data.push(response.response); // Update orders list
+                    this.orders.data.unshift(response.response); // Update orders list
                     this.successMessage = response.message;
                 }
             } catch (error) {

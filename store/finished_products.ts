@@ -1,41 +1,56 @@
 import type { AuthResponse, LoginCredentials, User } from "~/utils/models/auth";
-import type { CreateMaterialRequest, CreateMaterialResponse, Material, MaterialData, MaterialResponse, MaterialType, MaterialTypeData, MaterialTypeResponse } from "~/utils/models/products";
+import type { CreateFinishedProductRequest, CreateFinishedProductResponse, FinishedProduct, FinishedProductResponse, FinishedProductsResponse, FinishedProductsResponseData } from "~/utils/models/finished_products";
+import type { WorkInProgress } from "~/utils/models/production";
 
 export const useFinishedProductsStore = defineStore("finishedProducts", {
     state: () => ({
-        products: {} as MaterialData,
-        materialTypes: {} as MaterialTypeData,  // Add materialTypes to the state
+        products: {} as FinishedProductsResponseData,
         token: useCookie<string | null>("auth_token").value || null,
         successMessage: null as string | null,
         errorMessage: null as string | null,
         errors: {} as Record<string, string>,
         isLoading: false,
+        productImage: null as File | null,  // Add orderImage to the state
         user: null as User | null,  // Add user to the state
-        createMaterialForm: {} as CreateMaterialRequest,  // Add createMaterialForm to the state
-        selectedMaterial: null as Material | null,  // Add selectedMaterial to the state
+        createFinishedProductForm: {} as CreateFinishedProductRequest,  // Add createFinishedProductForm to the state
+        selectedProduct: null as FinishedProduct | null,  // Add selectedProduct to the state
     }),
 
     actions: {
         // Login action using $fetch
-        async createMaterial() {
+        async createFinishedProduct() {
             this.isLoading = true;
             if (!this.token) return;
             try {
-                const response = await $fetch<CreateMaterialResponse>(getApiUrl("products"), {
+                const formData = new FormData();
+
+                formData.append('id', this.createFinishedProductForm.id);
+                formData.append('name', this.createFinishedProductForm.name);
+                formData.append('order_id', this.createFinishedProductForm.order_id);
+                formData.append('work_in_progress_id', this.createFinishedProductForm.work_in_progress_id);
+                formData.append('rug_id', this.createFinishedProductForm.rug_id);
+                formData.append('description', this.createFinishedProductForm.description);
+                formData.append('available_quantity', this.createFinishedProductForm.available_quantity);
+                formData.append('total_price', this.createFinishedProductForm.total_price);
+                formData.append('unit', this.createFinishedProductForm.unit);
+                formData.append('shape', this.createFinishedProductForm.shape);
+                formData.append('length', this.createFinishedProductForm.length);
+                formData.append('width', this.createFinishedProductForm.width);
+
+                if (this.productImage) {
+                    formData.append("default_image", this.productImage);
+                }
+
+                const response = await $fetch<CreateFinishedProductResponse>(getApiUrl("finished-products"), {
                     method: "POST",
-                    body: {
-                        ...this.createMaterialForm,
-                    },
-                    headers: { Authorization: `Bearer ${this.token}` },
+                    body: formData,
+                    headers: { Authorization: `Bearer ${this.token}`, Accept: "application/json", },
                 });
 
                 if (response?.response) {
-                    console.log("Material created successfully:", response.response);
-                    //update products list
-                    this.products.data.push(response.response);  // Assuming the response contains the created material data
+                    this.products.data.unshift(response.response);  // Assuming the response contains the created material data
                     this.successMessage = response.message;
                 }
-
             } catch (error) {
                 // Handle API error
                 const errorMsg = handleApiError(error);
@@ -43,7 +58,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 this.errorMessage = errorMsg.errorMessage || "An error occurred while creating the material";
             } finally {
                 this.isLoading = false;
-                // this.createMaterialForm = {} as CreateMaterialRequest;  // Reset the form state
+                // this.createFinishedProductForm = {} as CreateFinishedProductRequest;  // Reset the form state
                 // this.errors = {};  // Reset errors
                 // this.successMessage = null;  // Reset success message
                 // this.errorMessage = null;  // Reset error message
@@ -51,27 +66,44 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
         },
 
         //update material profile using $fetch
-        async updateMaterial() {
+        async updateFinishedProduct() {
             this.isLoading = true;
             if (!this.token) return;
             try {
+                const formData = new FormData();
 
+                formData.append('id', this.createFinishedProductForm.id);
+                formData.append('name', this.createFinishedProductForm.name);
+                formData.append('order_id', this.createFinishedProductForm.order_id);
+                formData.append('work_in_progress_id', this.createFinishedProductForm.work_in_progress_id);
+                formData.append('rug_id', this.createFinishedProductForm.rug_id);
+                formData.append('description', this.createFinishedProductForm.description);
+                formData.append('available_quantity', this.createFinishedProductForm.available_quantity);
+                formData.append('total_price', this.createFinishedProductForm.total_price);
+                formData.append('unit', this.createFinishedProductForm.unit);
+                formData.append('shape', this.createFinishedProductForm.shape);
+                formData.append('length', this.createFinishedProductForm.length);
+                formData.append('width', this.createFinishedProductForm.width);
 
-                const response = await $fetch<CreateResponse>(getApiUrl(`products/${this.selectedMaterial?.id}`), {
+                if (this.productImage) {
+                    formData.append("default_image", this.productImage);
+                }
+
+                const response = await $fetch<CreateFinishedProductResponse>(getApiUrl(`products/${this.selectedProduct?.id}`), {
                     method: "PUT",
-                    body: {
-                        ...this.createMaterialForm,
-                        // Spread the rest of the fields
+                    body: formData,
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                        Accept: "application/json",
                     },
-                    headers: { Authorization: `Bearer ${this.token}` },
                 });
 
                 if (response?.response) {
-                    const updatedRug = response.response; // Assuming the updated material data is returned here
-                    const { id } = updatedRug;
+                    const updatedProduct = response.response; // Assuming the updated material data is returned here
+                    const { id } = updatedProduct;
                     this.successMessage = response.message;
                     this.products.data = this.products.data.map(material =>
-                        material.id === id ? { ...material, ...updatedRug } : material
+                        material.id === id ? { ...material, ...updatedProduct } : material
                     );
                 }
 
@@ -86,17 +118,16 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
         },
 
         // Fetch products using $fetch
-        async getMaterials() {
+        async getFinishedProducts() {
             this.isLoading = true;
             if (!this.token) return;
             try {
-                const response = await $fetch<MaterialResponse>(getApiUrl("products"), {
+                const response = await $fetch<FinishedProductsResponse>(getApiUrl("finished-products"), {
                     headers: { Authorization: `Bearer ${this.token}` },
                 });
 
                 if (response?.response) {
                     this.products = response.response;  // Assuming the response contains a 'products' array
-                    console.log("Clients data:", this.products);
                 }
             } catch (err) {
                 console.error("Error fetching products:", err);
@@ -106,26 +137,25 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
             }
         },
 
-        // Fetch material types using $fetch
-        async getMaterialTypes() {
+        async getFinishedProductByWorlInProgressId(id: number) {
             this.isLoading = true;
             if (!this.token) return;
             try {
-                const response = await $fetch<MaterialTypeResponse>(getApiUrl("products/material-types"), {
+                const response = await $fetch<FinishedProductResponse>(getApiUrl(`finished-products/work-in-progress/${id}`), {
                     headers: { Authorization: `Bearer ${this.token}` },
                 });
 
                 if (response?.response) {
-                    this.materialTypes = response.response;  // Assuming the response contains a 'materialTypes' array
-                    console.log("Material types data:", this.materialTypes);
+                    this.selectedProduct = response.response;  // Assuming the response contains a 'products' array
                 }
             } catch (err) {
-                console.error("Error fetching material types:", err);
-                this.errorMessage = "An error occurred while fetching material types data";
+                console.error("Error fetching products:", err);
+                this.errorMessage = "An error occurred while fetching material data";
             } finally {
                 this.isLoading = false;
             }
         },
+
 
 
         //delete material
@@ -133,21 +163,21 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
             this.isLoading = true;
             if (!this.token) return;
             try {
-                const response = await $fetch<CreateResponse>(getApiUrl(`products/${this.selectedMaterial?.id}`), {
+                const response = await $fetch<CreateFinishedProductResponse>(getApiUrl(`finished-products/${this.selectedProduct?.id}`), {
                     method: "DELETE",
                     headers: { Authorization: `Bearer ${this.token}` },
                 });
 
                 if (response?.response) {
-                    this.products.data = this.products.data.filter(material => material.id !== this.selectedMaterial?.id);  // Remove the deleted material from the list
+                    this.products.data = this.products.data.filter(product => product.id !== this.selectedProduct?.id);  // Remove the deleted material from the list
                     this.successMessage = response.message;
                 }
 
             } catch (error) {
                 // Handle API error
                 const errorMsg = handleApiError(error);
-                console.log("Error deleting material:", errorMsg);
-                this.errorMessage = errorMsg.errorMessage || "An error occurred while deleting the material";
+                console.log("Error deleting product:", errorMsg);
+                this.errorMessage = errorMsg.errorMessage || "An error occurred while deleting the product";
             } finally {
                 this.isLoading = false;
             }
@@ -155,19 +185,44 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
 
         //reset form and messages
         resetForm() {
-            this.createMaterialForm = {} as CreateMaterialRequest;  // Reset the form state
+            this.createFinishedProductForm = {} as CreateFinishedProductRequest;  // Reset the form state
             this.errors = {};  // Reset errors
-            this.successMessage = null;  // Reset success message
+            this.successMessage = null;  // Reset success me\ssage
             this.errorMessage = null;  // Reset error message
         },
 
 
-        setSelectedMaterial(material: any) {
-            this.selectedMaterial = material;  // Set the selected material profile
-            //set state form with selected material data
-            this.createMaterialForm = material
-
+        setSelectedProduct(product: any) {
+            this.selectedProduct = product;  // Set the selected product profile
+            //set state form with selected product data
+            this.createFinishedProductForm = product
         },
+
+        setCreateFormImage(image: File | null) {
+            this.productImage = image;
+        },
+
+        setProductForm(workInProgress: WorkInProgress): void {
+            if (!workInProgress?.order) return;
+
+            const {
+                total_price,
+                length,
+                width,
+                unit,
+                shape
+            } = workInProgress.order;
+
+            this.createFinishedProductForm = {
+                ...this.createFinishedProductForm,
+                total_price,
+                length,
+                width,
+                unit,
+                shape
+            };
+        }
+
     },
 
 

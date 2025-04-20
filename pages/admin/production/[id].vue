@@ -24,20 +24,6 @@
               </template>
             </CustomButton>
           </div>
-          <!-- <CustomButton @click="" type="submit" label="Allocate Materials" variant="brand" rounded="full"
-                                                                                                                                                                        :isLoading="false" :prefixIcon="true" :disabled="false" class="w-full">
-                                                                                                                                                                        <template #prefix>
-                                                                                                                                                                          <PlusIcon />
-                                                                                                                                                                        </template>
-                                                                                                                                                                      </CustomButton>
-                                                                                                                                                              
-                                                                                                                                                                      <CustomButton @click="" type="submit" label="Update Status" variant="warning" rounded="full" :isLoading="false"
-                                                                                                                                                                        :prefixIcon="true" :disabled="false" class="w-full">
-                                                                                                                                                                        <template #prefix>
-                                                                                                                                                                          <ArrrowUTurnIcon />
-                                                                                                                                                                        </template>
-                                                                                                                                                                      </CustomButton> -->
-  
         </div>
       </div>
       <Tabs value="0">
@@ -172,13 +158,13 @@
               :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials" stripedRows tableStyle="min-width: 50rem"
               @row-edit-save="onRowEditSave"
               :pt="{
-                                                                                                                                  table: { style: 'min-width: 50rem' },
-                                                                                                                                  column: {
-                                                                                                                                      bodycell: ({ state }) => ({
-                                                                                                                                          style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
-                                                                                                                                      })
-                                                                                                                                  }
-                                                                                                                              }">
+                                                                                                                                                                        table: { style: 'min-width: 50rem' },
+                                                                                                                                                                        column: {
+                                                                                                                                                                            bodycell: ({ state }) => ({
+                                                                                                                                                                                style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
+                                                                                                                                                                            })
+                                                                                                                                                                        }
+                                                                                                                                                                    }">
               <template #header>
                 <div class="flex justify-between items-center" v-if="!isProductionDone">
                   <!-- Button aligned to the left -->
@@ -270,56 +256,53 @@
             </DataTable>
           </TabPanel>
           <TabPanel value="5">
-            <div class="flex-col md:flex-row justify-between flex gap-4 items-start mx-4 py-12">
+            <div v-if="!product">
+              <!-- Empty state -->
+              <div
+                class="flex flex-col items-center justify-center gap-4 py-12 text-center text-gray-600 dark:text-gray-300">
+                <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No Product"
+                  class="w-40 h-40 opacity-60" />
+                <p class="text-xl font-semibold">No product uploaded</p>
+                <button
+                  class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-md transition duration-200"
+                  @click="setProductForm();isFinishedProductFormModal =true">
+                  Upload Product
+                </button>
+              </div>
+            </div>
+  
+            <div v-else class="flex-col md:flex-row justify-between flex gap-4 items-start mx-4 py-12">
               <div class="flex bg-white rounded-lg shadow dark:bg-gray-800 flex-col md:flex-row">
+                <!-- Image -->
                 <div class="relative w-full md:w-48 flex justify-center items-center">
-                  <img src="https://cdn.pixabay.com/photo/2013/07/13/14/07/apparel-162180_960_720.png"
-                    alt="shopping image"
-                    class="object-cover w-full h-48 md:h-full rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                  <img :src="product.default_image" alt="Product image"
+                    class="object-cover w-full h-48 md:h-full rounded-t-lg md:rounded-l-lg md:rounded-t-none" />
                 </div>
-                <form class="flex-auto p-6">
-                  <div class="flex flex-wrap">
-                    <h1 class="flex-auto text-xl font-semibold dark:text-gray-50">Product name</h1>
-                    <div class="text-xl font-semibold text-gray-500 dark:text-gray-300">$110.00</div>
-                    <div class="flex-none w-full mt-2 text-sm font-medium text-gray-500 dark:text-gray-300">In stock</div>
-                  </div>
-                  <div class="flex items-baseline mt-4 mb-6 text-gray-700 dark:text-gray-300">
-                    <div class="flex space-x-2">
   
-                      <label class="text-center">
+                <!-- Product Info -->
+                <div class="flex-auto p-6">
+                  <h1 class="text-2xl font-bold dark:text-white mb-2">{{ product.name }}</h1>
+                  <p class="text-gray-600 dark:text-gray-300 mb-4">{{ product.description }}</p>
+                  <!-- <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-12">
+                                  <InfoField label="Delivery Date"
+                                    :value="formatDateString(workInProgress.order?.delivery_date) ?? 'N/A'" />
+                                  <InfoField label="Start Date" :value="formatDateString(workInProgress?.start_date)" />
+                                  <InfoField label="Finishing Date" :value="formatDateString(workInProgress?.approx_end_date)" />
+                                  <InfoField label="Production Cost" :value="formatCurrency(workInProgress?.approx_production_cost)" />
+                                </div> -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 dark:text-gray-200">
+                    <InfoField label="Production Cost" :value="formatCurrency(product.actual_production_cost) ?? 'N/A'" />
+                    <InfoField label="Total Price" :value="formatCurrency(product.total_price) ?? 'N/A'" />
+                    <InfoField label="Size"
+                      :value="`${product.length} x ${product.width } ${ product.unit} (${product.shape})`" />
+                  </div>
   
-                        <input type="radio"
-                          class="flex items-center justify-center w-6 h-6 accent-violet-600 bg-gray-100 rounded-lg dark:bg-gray-600"
-                          name="size" value="xs">XS
-                      </label>
-                      <label class="text-center">
-                        <input type="radio" class="flex items-center justify-center w-6 h-6 accent-violet-600" name="size"
-                          value="s">S
-                      </label>
-                      <label class="text-center">
-                        <input type="radio" class="flex items-center justify-center w-6 h-6 accent-violet-600" name="size"
-                          value="m">M
-                      </label>
-                      <label class="text-center">
-                        <input type="radio" class="flex items-center justify-center w-6 h-6 accent-violet-600" name="size"
-                          value="l">L
-                      </label>
-                      <label class="text-center">
-                        <input type="radio" class="flex items-center justify-center w-6 h-6 accent-violet-600" name="size"
-                          value="xl">XL
-                      </label>
-                    </div>
-                    <a href="#" class="hidden ml-auto text-sm text-gray-500 underline md:block dark:text-gray-300">Size
-                      Guide
-                    </a>
+                  <div class="mt-6">
+                    <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Rug Colors</h4>
+                    <ColorPalertView :colors="product?.order?.color_palet" />
                   </div>
-                  <div class="flex mb-4 text-sm font-medium">
-                    <button type="button"
-                      class="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg ">Buy
-                      now</button>
-                  </div>
-                  <p class="text-sm text-gray-500 dark:text-gray-300">Free shipping on all continental US orders.</p>
-                </form>
+  
+                </div>
               </div>
             </div>
           </TabPanel>
@@ -397,8 +380,6 @@
               </div>
             </div>
           </TabPanel>
-  
-  
         </TabPanels>
       </Tabs>
     </div>
@@ -412,6 +393,10 @@
   
     <DoneProductionModal :isDoneProductionModal="isDoneProductionModal" :workInProgress="workInProgress"
       @update:isDoneProductionModal="(value) => isDoneProductionModal = value" />
+  
+  
+    <AddFinishedProductModal :isFinishedProductFormModal="isFinishedProductFormModal" :product="product"
+      @update:isFinishedProductFormModal="(value) => isFinishedProductFormModal = value" />
   
   </admin-layout>
 </template>
@@ -441,11 +426,14 @@ import PlusIcon from '~/icons/PlusIcon.vue'
 import ArrrowUTurnIcon from '~/icons/ArrrowUTurnIcon.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import DoneProductionModal from '@/components/production/modals/DoneProductionModal.vue'
+import AddFinishedProductModal from '@/components/production/modals/AddFinishedProductModal.vue'
 import type { AddWorkInProgressMaterialRequest, UpdateWorkInProgress } from '~/utils/models/production'
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
 import { useMaterialStore } from '~/store/material'
+
 import type { Material } from '~/utils/models/materials'
+import { useFinishedProductsStore } from '~/store/finished_products'
 
 
 const { formatCurrency } = useCurrency();
@@ -456,6 +444,7 @@ const authStore = useAuthStore();
 const snackbar = useSnackbar();
 const productionStore = useProductionStore();
 const materialsStore = useMaterialStore();
+const finishedProductStore = useFinishedProductsStore();
 
 
 const isMounted = ref(false) // Track if component has mounted
@@ -464,6 +453,7 @@ const isLoading = computed(() => authStore.isLoading);
 const userProfile = computed(() => authStore.user);
 const showConfirmUpdateStatus = ref(false)
 const isDoneProductionModal = ref(false)
+const isFinishedProductFormModal = ref(false)
 const nextStatus = ref();
 
 
@@ -522,7 +512,8 @@ const onRowEditSave = (event: any) => {
 
 const editingRows = ref([]);
 
-const workInProgress = computed(() => productionStore.selectedWorkInProgress)
+const workInProgress = computed(() => productionStore.selectedWorkInProgress);
+const product = computed(() => finishedProductStore.selectedProduct);
 const route = useRoute()
 onMounted(() => {
   isMounted.value = true // Set to true once component is mounted
@@ -574,6 +565,7 @@ onMounted(async () => {
     await productionStore.getSingleWorkInProgress(id)
     await productionStore.getMaterials(id)
     await materialsStore.getMaterials(id)
+    await finishedProductStore.getFinishedProductByWorlInProgressId(id)
   }
 });
 
@@ -677,5 +669,8 @@ const overallMaterialCost = computed(() =>
   groupedMaterials.value.reduce((sum, group) => sum + group.totalCost, 0)
 );
 
+const setProductForm = () => {
+  finishedProductStore.setProductForm(workInProgress)
+}
 
 </script>

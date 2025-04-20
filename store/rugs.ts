@@ -31,7 +31,7 @@ export const useRugStore = defineStore("rug", {
                 if (response?.response) {
                     console.log("Rug created successfully:", response.response);
                     //update rugs list
-                    this.rugs.data.push(response.response);  // Assuming the response contains the created rug data
+                    this.rugs.data.unshift(response.response);  // Assuming the response contains the created rug data
                     this.successMessage = response.message;
                 }
 
