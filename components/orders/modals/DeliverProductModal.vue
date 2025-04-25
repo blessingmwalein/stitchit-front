@@ -90,7 +90,7 @@
                         <SelectElement label="Payment Method" name="payment_method" :search="true" :native="false"
                             input-type="search" autocomplete="disabled" placeholder="Type" :items="paymentMethods"
                             :columns="{
-                                                                                                                                                            container: 12,                                                                      }"
+                                                                                                                                                                    container: 12,                                                                      }"
                             :rules="['required']" />
     
                         <!-- <StaticElement name="contact_title" content="Contact details" tag="h3" top="2" /> -->
@@ -101,8 +101,9 @@
                         <SelectElement label="Currency" name="currency" :search="true" :native="false" input-type="search"
                             autocomplete="disabled" placeholder="Type" :items="currencies"
                             :columns="{
-                                                                                                                                                            container: 6,
-                                                                                                                                                          }" :rules="['required']" />
+                                                                                                                                                                    container: 6,
+                                                                                                                                                                  }"
+                            :rules="['required']" />
     
                         <TextElement name="payment_reference" input-type="text" v-mask="'$#,##0.00'"
                             label="Payment Reference" :columns="{ container: 12 }" />
@@ -110,19 +111,19 @@
     
                         <StaticElement name="span"
                             :columns="{
-                                                                                                                                                          container: 4,
-                                                                                                                                                        }"
+                                                                                                                                                                  container: 4,
+                                                                                                                                                                }"
                             tag="span" />
                         <ButtonElement name="close" button-class="bg-red-500"
                             :columns="{
-                                                                                                                                                          container: 4,
-                                                                                                                                                        }"
+                                                                                                                                                                  container: 4,
+                                                                                                                                                                }"
                             @click="closeModal()" button-label="Close" :full="true" size="lg" />
     
-                        <ButtonElement button-class="bg-brand-500" name="register"
+                        <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register"
                             :columns="{
-                                                                                                                                                          container: 4,
-                                                                                                                                                        }" :submits="true"
+                                                                                                                                                                  container: 4,
+                                                                                                                                                                }" :submits="true"
                             button-label="Submit" :full="true" size="lg" />
                     </Vueform>
                 </client-only>
@@ -148,6 +149,7 @@ import type { FinishedProduct } from '~/utils/models/finished_products';
 const emit = defineEmits(['update:isViewDeliverProductModal', 'success']);
 const ordersStore = useOrderStore();
 const errors: Record<string, string> = ordersStore.errors;
+const isLoading = computed(() => ordersStore.isLoading)
 
 const { formatCurrency } = useCurrency();
 const snackbar = useSnackbar();

@@ -1,183 +1,190 @@
 <template>
     <admin-layout>
-        <PageBreadcrumb :pageTitle="currentPageTitle" />
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+        <template v-if="isLoading">
+            <PageSkeletonLoader />
+        </template>
+        <template v-else>
+            <PageBreadcrumb :pageTitle="currentPageTitle" />
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
     
-            <DataTable filterDisplay="menu" :loading="isLoading" dataKey="id" v-model:filters="filters" sortMode="multiple"
-                paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="workInProgressItems.data" stripedRows
-                tableStyle="min-width: 50rem" :globalFilterFields="['id', 'rug.name', 'status', 'size.name']">
+                <DataTable filterDisplay="menu" :loading="isLoading" dataKey="id" v-model:filters="filters"
+                    sortMode="multiple" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]"
+                    :value="workInProgressItems.data" stripedRows tableStyle="min-width: 50rem"
+                    :globalFilterFields="['id', 'rug.name', 'status', 'size.name']">
     
-                <template #header>
-                    <div class="flex justify-between items-center ">
-                        <!-- Add New Order Button -->
-                        <div>
+                    <template #header>
+                        <div class="flex justify-between items-center ">
+                            <!-- Add New Order Button -->
+                            <div>
     
     
-                        </div>
-                        <!-- Filters -->
-                        <div class="flex-1 flex justify-center">
-                            <div
-                                class="flex space-x-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-full border border-gray-300">
-                                <button v-for="status in ['All', ...productionStatuses]" :key="status"
-                                    @click="applyStatusFilter(status)" :class="[ 
-                              'px-3 py-1 text-sm font-medium rounded-full transition-colors', 
-                              selectedStatus === status
-                                ? 'bg-white text-indigo-600 shadow border border-gray-300'
-                                : 'text-gray-600 hover:text-indigo-600'
-                            ]">
-                                    {{ status }}
-                                </button>
                             </div>
-                        </div>
-    
-                        <!-- Search input -->
-                        <div class="flex justify-between items-center">
-    
+                            <!-- Filters -->
+                            <div class="flex-1 flex justify-center">
+                                <div
+                                    class="flex space-x-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-full border border-gray-300">
+                                    <button v-for="status in ['All', ...productionStatuses]" :key="status"
+                                        @click="applyStatusFilter(status)" :class="[ 
+                                      'px-3 py-1 text-sm font-medium rounded-full transition-colors', 
+                                      selectedStatus === status
+                                        ? 'bg-white text-indigo-600 shadow border border-gray-300'
+                                        : 'text-gray-600 hover:text-indigo-600'
+                                    ]">
+                                        {{ status }}
+                                    </button>
+                                </div>
+                            </div>
     
                             <!-- Search input -->
-                            <div class="flex justify-end">
-                                <IconField>
-                                    <InputIcon>
-                                        <i class="pi pi-search" />
-                                    </InputIcon>
-                                    <InputText v-if="filters" v-model="filters['global'].value"
-                                        placeholder="Search Production" />
-                                </IconField>
-                            </div>
-                        </div>
-                    </div>
+                            <div class="flex justify-between items-center">
     
-                </template>
     
-                <!-- Order ID Column with Filter -->
-                <Column field="client_name" header="Client Infor" sortable :filter="true">
-                    <template #body="slotProps">
-                        <div class="flex items-center">
-                            <!-- Using the InitialAvatar component -->
-                            <InitialAvatar :name="slotProps.data.order.client_name" />
-    
-                            <div class="ml-3">
-                                <div class="font-semibold text-sm">#{{slotProps.data.order.order_number}} - {{
-                                    slotProps.data.order.client_name }}</div>
-                                <!-- Address with reduced font size and faint color -->
-                                <div class="flex items-center space-x-2 text-xs text-gray-400">
-    
-                                    <EmailAtIcon :height="15" :width="15" />
-    
-                                    {{ slotProps.data.order.email }}
-    
+                                <!-- Search input -->
+                                <div class="flex justify-end">
+                                    <IconField>
+                                        <InputIcon>
+                                            <i class="pi pi-search" />
+                                        </InputIcon>
+                                        <InputText v-if="filters" v-model="filters['global'].value"
+                                            placeholder="Search Production" />
+                                    </IconField>
                                 </div>
                             </div>
                         </div>
-                    </template>
-                    <template #filter="{ filterModel }">
-                        <InputText v-model="filterModel.value" placeholder="Client name" class="w-full" />
-                    </template>
-                </Column>
-    
-                <!-- Rug Name Column with Filter -->
-                <Column field="shape" header="Order Info" sortable :filter="true">
-                    <template #body="slotProps">
-                        <div class="flex items-center">
-                            <!-- Using the InitialAvatar component -->
-    
-                            <div class="ml-3">
-                                <div class="font-normal text-sm">{{slotProps.data.order.rug.name }} - {{
-                                    slotProps.data.order.shape }}</div>
-                                <div class="font-semibold text-sm">{{ slotProps.data.order.length }} x {{
-                                    slotProps.data.order.width }}
-                                    {{
-                                    slotProps.data.order.unit }}</div>
-                            </div>
-                        </div>
     
                     </template>
     
-                </Column>
+                    <!-- Order ID Column with Filter -->
+                    <Column field="client_name" header="Client Infor" sortable :filter="true">
+                        <template #body="slotProps">
+                            <div class="flex items-center">
+                                <!-- Using the InitialAvatar component -->
+                                <InitialAvatar :name="slotProps.data.order.client_name" />
     
-                <!-- Order Size Column with Filter -->
-                <Column field="start_date" header="Start, End Date" sortable :filter="true">
-                    <template #body="slotProps">
-                        <div class="flex items-center">
+                                <div class="ml-3">
+                                    <div class="font-semibold text-sm">#{{slotProps.data.order.order_number}} - {{
+                                        slotProps.data.order.client_name }}</div>
+                                    <!-- Address with reduced font size and faint color -->
+                                    <div class="flex items-center space-x-2 text-xs text-gray-400">
     
+                                        <EmailAtIcon :height="15" :width="15" />
     
-                            <div class="ml-3">
-                                <div class="font-normal text-sm">{{ formatDateString(slotProps.data.start_date) }} - {{
-                                    formatDateString(slotProps.data.approx_end_date) }}</div>
-                                <div class="font-bold text-sm">{{ formatCurrency(slotProps.data.approx_production_cost) }}
+                                        {{ slotProps.data.order.email }}
+    
+                                    </div>
                                 </div>
                             </div>
+                        </template>
+                        <template #filter="{ filterModel }">
+                            <InputText v-model="filterModel.value" placeholder="Client name" class="w-full" />
+                        </template>
+                    </Column>
+    
+                    <!-- Rug Name Column with Filter -->
+                    <Column field="shape" header="Order Info" sortable :filter="true">
+                        <template #body="slotProps">
+                            <div class="flex items-center">
+                                <!-- Using the InitialAvatar component -->
+    
+                                <div class="ml-3">
+                                    <div class="font-normal text-sm">{{slotProps.data.order.rug.name }} - {{
+                                        slotProps.data.order.shape }}</div>
+                                    <div class="font-semibold text-sm">{{ slotProps.data.order.length }} x {{
+                                        slotProps.data.order.width }}
+                                        {{
+                                        slotProps.data.order.unit }}</div>
+                                </div>
+                            </div>
+    
+                        </template>
+    
+                    </Column>
+    
+                    <!-- Order Size Column with Filter -->
+                    <Column field="start_date" header="Start, End Date" sortable :filter="true">
+                        <template #body="slotProps">
+                            <div class="flex items-center">
+    
+    
+                                <div class="ml-3">
+                                    <div class="font-normal text-sm">{{ formatDateString(slotProps.data.start_date) }} - {{
+                                        formatDateString(slotProps.data.approx_end_date) }}</div>
+                                    <div class="font-bold text-sm">{{ formatCurrency(slotProps.data.approx_production_cost)
+                                        }}
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <template #filter="{ filterModel }">
+                            <Dropdown v-model="filterModel.value" :options="sizeOptions" placeholder="Select Size"
+                                class="w-full" />
+                        </template>
+                    </Column>
+    
+                    <!-- Status Column with Filter -->
+                    <Column field="status" header="Status" sortable :filter="true">
+                        <template #body="slotProps">
+                            <Badge variant="light" :color="light">
+                                {{ slotProps.data.status }}
+                            </Badge>
+                        </template>
+                        <template #filter="{ filterModel }">
+                            <Dropdown v-model="filterModel.value" :options="statusOptions" placeholder="Select Status"
+                                class="w-full" />
+                        </template>
+                    </Column>
+    
+                    <!-- Actions Column -->
+                    <Column header="Actions">
+                        <template #body="slotProps">
+                            <div class="flex space-x-2">
+                                <!-- View Button -->
+                                <Button @click="handleViewProductionModal(slotProps.data)" variant='outline' size='sm'
+                                    class="p-button-rounded p-button-warning p-button-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+                                </Button>
+                                <Button @click="handleEditOrder(slotProps.data)" variant='outline' size="sm"
+                                    class="p-button-rounded p-button-warning p-button-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                                    </svg>
+    
+                                </Button>
+                                <!-- Edit Button -->
+                                <Button @click="showConfirmModal = true;productionStore.setSelectedOrder(slotProps.data) "
+                                    variant='outline' size="sm" class="p-button-rounded p-button-warning p-button-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
+                                    </svg>
+    
+                                </Button>
+                            </div>
+                        </template>
+                    </Column>
+    
+    
+                    <template #empty>
+                        <div class="flex flex-col items-center justify-center py-10 text-gray-500">
+                            <p class="mt-4 text-lg font-semibold">No production items found</p>
+                            <p class="text-sm text-gray-400">Try adding new production items to see them here.</p>
                         </div>
                     </template>
-                    <template #filter="{ filterModel }">
-                        <Dropdown v-model="filterModel.value" :options="sizeOptions" placeholder="Select Size"
-                            class="w-full" />
-                    </template>
-                </Column>
     
-                <!-- Status Column with Filter -->
-                <Column field="status" header="Status" sortable :filter="true">
-                    <template #body="slotProps">
-                        <Badge variant="light" :color="light">
-                            {{ slotProps.data.status }}
-                        </Badge>
-                    </template>
-                    <template #filter="{ filterModel }">
-                        <Dropdown v-model="filterModel.value" :options="statusOptions" placeholder="Select Status"
-                            class="w-full" />
-                    </template>
-                </Column>
-    
-                <!-- Actions Column -->
-                <Column header="Actions">
-                    <template #body="slotProps">
-                        <div class="flex space-x-2">
-                            <!-- View Button -->
-                            <Button @click="handleViewProductionModal(slotProps.data)" variant='outline' size='sm'
-                                class="p-button-rounded p-button-warning p-button-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" width="20" height="20">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                </svg>
-                            </Button>
-                            <Button @click="handleEditOrder(slotProps.data)" variant='outline' size="sm"
-                                class="p-button-rounded p-button-warning p-button-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" width="20" height="20">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
-                                </svg>
-    
-                            </Button>
-                            <!-- Edit Button -->
-                            <Button @click="showConfirmModal = true;productionStore.setSelectedOrder(slotProps.data) "
-                                variant='outline' size="sm" class="p-button-rounded p-button-warning p-button-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" width="20" height="20">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
-                                </svg>
-    
-                            </Button>
-                        </div>
-                    </template>
-                </Column>
+                </DataTable>
     
     
-                <template #empty>
-                    <div class="flex flex-col items-center justify-center py-10 text-gray-500">
-                        <p class="mt-4 text-lg font-semibold">No production items found</p>
-                        <p class="text-sm text-gray-400">Try adding new production items to see them here.</p>
-                    </div>
-                </template>
-    
-            </DataTable>
-    
-    
-        </div>
+            </div>
+        </template>
     
         <ViewProductionModal :isViewProductionModal="isViewProductionModal" :workInProgress="selectedWorkInProgress"
             @update:isViewProductionModal="(value ) => isViewProductionModal = value" />
@@ -222,6 +229,7 @@ import StartProductionFormModal from '~/components/orders/modals/StartProduction
 import { useProductionStore } from '~/store/production'
 import type { WorkInProgress } from '~/utils/models/production'
 import { productionStatuses } from '~/utils/data/colors'
+import PageSkeletonLoader from '~/components/ui/PageSkeletonLoader.vue'
 
 const { formatCurrency } = useCurrency();
 const { formatDate, formatDateString } = useDateFormat();

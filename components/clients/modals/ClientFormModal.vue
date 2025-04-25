@@ -70,7 +70,7 @@
                 container: 4,
               }" @click="closeModal()" button-label="Close" :full="true" size="lg" />
   
-            <ButtonElement button-class="bg-brand-500" name="register" :columns="{
+            <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register" :columns="{
                 container: 4,
               }" :submits="true" button-label="Submit" :full="true" size="lg" />
           </Vueform>
@@ -97,6 +97,9 @@ const errors: Record<string, string> = clientStore.errors;
 const hasErrors = ref(false);
 
 const snackbar = useSnackbar();
+
+const isLoading = computed(() => clientStore.isLoading)
+
 
 const props = defineProps({
   isClientFromModal: {
