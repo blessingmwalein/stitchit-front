@@ -8,12 +8,31 @@
         tableStyle="min-width: 50rem" :globalFilterFields="['id', 'rug.name', 'status', 'size.name']">
   
         <template #header>
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-center ">
             <!-- Add New Order Button -->
-            <Button @click="isOrderFormModal =true" variant="primary" class="p-button-rounded p-button-sm"
-              label="Add New Order" icon="pi pi-plus">
-              Create Order
-            </Button>
+            <div>
+              <CustomButton @click="isOrderFormModal = true" variant="primary" rounded="full" label="Create order"
+                :prefixIcon="true">
+                <template #prefix>
+                  <PlusIcon></PlusIcon>
+                </template>
+              </CustomButton>
+  
+            </div>
+            <!-- Filters -->
+            <div class="flex-1 flex justify-center">
+              <div class="flex space-x-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-full border border-gray-300">
+                <button v-for="status in ['All', ...orderStatuses]" :key="status" @click="applyStatusFilter(status)"
+                  :class="[ 
+                  'px-3 py-1 text-sm font-medium rounded-full transition-colors', 
+                  selectedType === status
+                    ? 'bg-white text-indigo-600 shadow border border-gray-300'
+                    : 'text-gray-600 hover:text-indigo-600'
+                ]">
+                  {{ status }}
+                </button>
+              </div>
+            </div>
   
             <!-- Search input -->
             <div class="flex justify-end">
@@ -25,6 +44,7 @@
               </IconField>
             </div>
           </div>
+  
         </template>
   
         <!-- Order ID Column with Filter -->
@@ -120,7 +140,7 @@
           <template #body="slotProps">
             <div class="flex space-x-2">
               <!-- View Button -->
-              <Button @click="handleViewOrder(slotProps.data)" variant='outline' size='sm'
+              <Button @click="handleViewProductionModal(slotProps.data)" variant='outline' size='sm'
                 class="p-button-rounded p-button-warning p-button-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" width="20" height="20">
@@ -172,12 +192,14 @@
   
     <ViewOrderModal :isViewOrderModal="isViewOrderModal" :order="selectedOrder"
       @update:isViewOrderModal="(value ) => isViewOrderModal = value" @processOrder="handleProcessOrder(selectedOrder)"
-      @startProduction="handleStartProduction(selectedOrder)"
+      @startProduction="handleStartProduction(selectedOrder)" @deliverOrder="handleDeliverOrder(selectedOrder)"
       @edit="isViewOrderModal = false; handleEditOrder(selectedOrder)" />
   
     <OrderTemplateModal :isViewProcessOrderModal="isViewProcessOrderModal" :order="selectedOrder"
       @update:isViewProcessOrderModal="(value ) => isViewProcessOrderModal = value" />
   
+    <DeliverProductModal :isViewDeliverProductModal="isViewDeliverProductModal" :order="selectedOrder"
+      @update:isViewDeliverProductModal="(value ) => isViewDeliverProductModal = value" />
   
   
     <ConfirmModal :visible="showConfirmModal" @update:visible="showConfirmModal = $event" @confirmed="handleConfirmation">
@@ -198,7 +220,8 @@ import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import InitialAvatar from '@/components/common/InitialAvatar.vue'
 import CustomSelectField from '@/components/forms/FormElements/CustomSelectField.vue'
 import {
-  PhoneIcon
+  PhoneIcon,
+  PlusIcon
 } from '~/icons'
 import {
   EmailAtIcon
@@ -208,7 +231,6 @@ import {
 } from '~/icons'
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
-import CustomButton from "@/components/common/buttons/CustomButton.vue";
 import OrderFormModal from '@/components/orders/modals/OrderFormModal.vue'
 import ViewOrderModal from '@/components/orders/modals/ViewOrderModal.vue'
 import OrderTemplateModal from '@/components/orders/modals/OrderTemplateModal.vue'
@@ -225,8 +247,11 @@ import {
 import { useCurrency } from '~/composables/useCurrency';
 import { useDateFormat } from '~/composables/useDateFomat';
 import StartProductionFormModal from '~/components/orders/modals/StartProductionFormModal.vue'
+import DeliverProductModal from '~/components/orders/modals/DeliverProductModal.vue'
 import type { Order } from '~/utils/models/order'
 import OrderStatusBadge from '~/components/orders/OrderStatusBadge.vue'
+import { orderStatuses } from '~/utils/data/colors'
+import CustomButton from '@/components/common/buttons/CustomButton.vue'
 
 const { formatCurrency } = useCurrency();
 const { formatDate, formatDateString } = useDateFormat();
@@ -236,6 +261,8 @@ const { formatDate, formatDateString } = useDateFormat();
 // Store & State
 const ordersStore = useOrderStore();
 const isMounted = ref(false) // Track if component has mounted
+
+const selectedType = ref('all');
 
 const snackbar = useSnackbar();
 
@@ -249,8 +276,16 @@ const isViewOrderModal = ref(false)
 const showConfirmModal = ref(false)
 const isViewProcessOrderModal = ref(false)
 const isStartProductionFormModal = ref(false)
+const isViewDeliverProductModal = ref(false)
 
 
+const handleViewProductionModal = (order: Order) => {
+  //   productionStore.setSelectedWorkInProgress(order);
+  //   isViewProductionModal.value = true;
+  //navigate to production view 
+  navigateTo(`/admin/orders/${order.id}`);
+
+}
 
 onMounted(() => {
   isMounted.value = true // Set to true once component is mounted
@@ -309,6 +344,14 @@ definePageMeta({
   ],
 });
 
+function applyStatusFilter(status: string) {
+  selectedType.value = status
+
+  // clear / set the table filter
+  filters.value.status.value =
+    status === 'All' ? null : status.toLowerCase()
+}
+
 const currentPageTitle = ref('Orders')
 
 onMounted(async () => {
@@ -338,6 +381,14 @@ const handleStartProduction = (order: any) => {
   isViewOrderModal.value = false;
   ordersStore.setSelectedOrder(order);
   isStartProductionFormModal.value = true;
+}
+
+
+const handleDeliverOrder = (order: any) => {
+  isViewOrderModal.value = false;
+  ordersStore.setSelectedOrder(order);
+  ordersStore.setDeliverOrderForm(order);
+  isViewDeliverProductModal.value = true;
 }
 
 const isEditButtonVisible = ((order: Order) => {

@@ -2,6 +2,8 @@
   <ThemeProvider>
     <SidebarProvider>
       <NuxtPage />
+      <NuxtSnackbar />
+  
     </SidebarProvider>
   </ThemeProvider>
 </template>

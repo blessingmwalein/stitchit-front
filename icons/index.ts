@@ -55,6 +55,8 @@ import PhoneIcon from "./PhoneIcon.vue";
 import MapPinIcon from "./MapPinIcon.vue";
 import ArrrowUTurn from "./ArrrowUTurnIcon.vue";
 import PencilIcon from "./PencilIcon.vue";
+import CheckBadge from "./CheckBadge.vue";
+import ClipBoardIcon from "./ClipBoardIcon.vue";
 export {
   BellIcon,
   BarChartIcon,
@@ -113,4 +115,6 @@ export {
   MapPinIcon,
   ArrrowUTurn,
   PencilIcon,
+  CheckBadge,
+  ClipBoardIcon
 };

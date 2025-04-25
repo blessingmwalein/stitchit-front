@@ -32,12 +32,14 @@ export interface WorkInProgress {
     client_name: string;
     email: string;
     approx_production_cost: number;
+    actual_production_cost: number;
     production_number: string;
     created_at: Date;
     updated_at: Date;
     labour_cost: number;
     material_cost: number;
     order: Order;
+    total_hours:number
 }
 
 
@@ -61,6 +63,7 @@ export interface UpdateWorkInProgress {
     approx_end_date: Date;
     status: string;
     approx_production_cost: number;
+    total_hours: number;
 }
 
 

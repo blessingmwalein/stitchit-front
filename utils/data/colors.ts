@@ -56,6 +56,28 @@ export const unitsData = [
 export const materialUnitsData = [
     { value: 'Gramms', label: 'Gramms' },
     { value: 'Kg', label: 'Kg' },
-    { value: 'Litres', label: 'Litres' },  
-    { value: 'Meters', label: 'Meters' },  
+    { value: 'Litres', label: 'Litres' },
+    { value: 'Meters', label: 'Meters' },
+];
+export const orderStatuses = [
+    'Pending', 'Processing', 'In Progress', 'Delivered', 'Cancelled'
+];
+
+export const productionStatuses = [
+    'Tufting', 'Binding', 'In Progress', 'Done'
+];
+
+
+
+//payment methods  'ecocash', 'cash', 'innbucks'
+export const paymentMethods = [
+    { value: 'ecocash', label: 'Ecocash' },
+    { value: 'cash', label: 'Cash' },
+    { value: 'innbucks', label: 'Innbucks' },
+];
+
+//currencies
+export const currencies = [
+    { value: 'USD', label: 'USD' },
+    { value: 'ZWL', label: 'ZWL' },
 ];

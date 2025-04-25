@@ -32,7 +32,7 @@ export const useMaterialStore = defineStore("material", {
                 if (response?.response) {
                     console.log("Material created successfully:", response.response);
                     //update materials list
-                    this.materials.data.push(response.response);  // Assuming the response contains the created material data
+                    this.materials.data.unshift(response.response);  // Assuming the response contains the created material data
                     this.successMessage = response.message;
                 }
 

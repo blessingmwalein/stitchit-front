@@ -34,7 +34,7 @@ export const useClientsStore = defineStore("client", {
         if (response?.response) {
           console.log("Client created successfully:", response.response);
           //update clients list
-          this.clients.data.push(response.response);  // Assuming the response contains the created client data
+          this.clients.data.unshift(response.response);  // Assuming the response contains the created client data
           this.successMessage = response.message;
         }
 

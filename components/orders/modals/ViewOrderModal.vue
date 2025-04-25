@@ -8,35 +8,51 @@
             Order #{{ order?.order_number }} - {{ order?.client_name }}
           </h4>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-  
+            {{ order?.is_order_ready? 'This order is ready for delivery!': '' }} <br><br>
             <OrderStatusBadge :status="order?.status" />
           </p>
         </div>
-        <div class="flex gap-3 mr-3 w-1/4">
-          <CustomButton v-if="isEditButtonVisible" @click="editOrder()" label="Edit Order" :prefixIcon="true"
-            variant="brand" rounded="full">
-            <template #prefix>
-              <div class="mr-3">
-                <PencilIcon :height="20" :width="20" />
-              </div>
-            </template>
-          </CustomButton>
-          <CustomButton v-if="isProcessButtonVisible" @click="processOrder()" label="Proccess" variant="success"
-            rounded="full" :prefixIcon="true">
-            <template #prefix>
-              <div class="mr-3">
-                <ArrrowUTurnIcon :height="20" :width="20" />
-              </div>
-            </template>
-          </CustomButton>
-          <CustomButton v-if="isStartProductionButtonVisible" @click="startProduction()" label="Start Production"
-            variant="warning" rounded="full" :prefixIcon="true">
-            <template #prefix>
-              <div class="mr-3">
-                <ArrrowUTurnIcon :height="20" :width="20" />
-              </div>
-            </template>
-          </CustomButton>
+        <div class="flex gap-3 mr-3 ">
+          <div>
+            <CustomButton v-if="isEditButtonVisible" @click="editOrder()" label="Edit Order" :prefixIcon="true"
+              variant="brand" rounded="full">
+              <template #prefix>
+                <div class="mr-3">
+                  <PencilIcon :height="20" :width="20" />
+                </div>
+              </template>
+            </CustomButton>
+          </div>
+          <div>
+            <CustomButton v-if="isProcessButtonVisible" @click="processOrder()" label="Proccess" variant="success"
+              rounded="full" :prefixIcon="true">
+              <template #prefix>
+                <div class="mr-3">
+                  <ArrrowUTurnIcon :height="20" :width="20" />
+                </div>
+              </template>
+            </CustomButton>
+          </div>
+          <div>
+            <CustomButton v-if="isStartProductionButtonVisible" @click="startProduction()" label="Start Production"
+              variant="warning" rounded="full" :prefixIcon="true">
+              <template #prefix>
+                <div class="mr-3">
+                  <ArrrowUTurnIcon :height="20" :width="20" />
+                </div>
+              </template>
+            </CustomButton>
+          </div>
+          <div>
+            <CustomButton v-if="order?.is_order_ready" @click="deliverOrder()" label="Deliver Product"
+              variant="success" rounded="full" :prefixIcon="true">
+              <template #prefix>
+                <div class="mr-3">
+                  <TruckIcon :height="20" :width="20" />
+                </div>
+              </template>
+            </CustomButton>
+          </div>
         </div>
         <button @click="closeModal()"
           class="transition-color flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300">
@@ -53,13 +69,13 @@
       <div class="no-scrollbar relative w-full overflow-y-auto bg-white dark:bg-gray-900">
         <!-- Image Section (no border if it's just the image) -->
         <!-- <div v-if="order?.image_url" class="mb-6 flex justify-center">
-                                    <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 max-w-full"
-                                      style="max-height: 400px; max-width: 100%;">
-                                      <img :src="`${config.public.imageUrl}${order.image_url}`" alt="Order Image"
-                                        class="w-full h-auto object-cover max-h-[400px] rounded-2xl" />
-                                    </div>
-                                  </div>
-                             -->
+                                                <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 max-w-full"
+                                                  style="max-height: 400px; max-width: 100%;">
+                                                  <img :src="`${config.public.imageUrl}${order.image_url}`" alt="Order Image"
+                                                    class="w-full h-auto object-cover max-h-[400px] rounded-2xl" />
+                                                </div>
+                                              </div>
+                                         -->
   
         <!-- Client Information -->
         <div class="p-5 mb-6 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 relative">
@@ -156,13 +172,14 @@ import { useDateFormat } from '~/composables/useDateFomat';
 import ArrrowUTurnIcon from '~/icons/ArrrowUTurnIcon.vue';
 import PencilIcon from '~/icons/PencilIcon.vue';
 import ColorPalertView from '../ColorPalertView.vue';
+import TruckIcon from '~/icons/TruckIcon.vue';
 
 const { formatCurrency } = useCurrency();
 const { formatDate, formatDateString } = useDateFormat();
 
 const config = useRuntimeConfig();
 
-const emit = defineEmits(['update:isViewOrderModal', 'edit', 'processOrder', 'startProduction']);
+const emit = defineEmits(['update:isViewOrderModal', 'edit', 'processOrder', 'startProduction', 'deliverOrder']);
 
 const props = defineProps({
   isViewOrderModal: {
@@ -191,6 +208,11 @@ const processOrder = () => {
 
 const startProduction = () => {
   emit('startProduction');
+};
+
+
+const deliverOrder = () => {
+  emit('deliverOrder');
 };
 
 
