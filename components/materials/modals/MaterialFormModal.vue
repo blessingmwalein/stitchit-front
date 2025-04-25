@@ -69,7 +69,9 @@
                                                         }" @click="closeModal()" button-label="Close" :full="true"
               size="lg" />
   
-            <ButtonElement button-class="bg-brand-500" name="register" :columns="{
+            <ButtonElement 
+             :loading="isLoading"
+            button-class="bg-brand-500" name="register" :columns="{
                                                           container: 4,
                                                         }" :submits="true" button-label="Submit" :full="true"
               size="lg" />
@@ -95,6 +97,7 @@ import { materialUnitsData } from '~/utils/data/colors';
 const emit = defineEmits(['update:isMaterialFormModal', 'success']);
 const materialStore = useMaterialStore();
 const errors: Record<string, string> = materialStore.errors;
+  const isLoading = computed(() => materialStore.isLoading)
 
 
 const snackbar = useSnackbar();

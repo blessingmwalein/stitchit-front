@@ -75,8 +75,8 @@
             <StaticElement name="span" :columns="{ container: 4 }" tag="span" />
             <ButtonElement name="close" button-class="bg-red-500" :columns="{ container: 4 }" @click="closeModal()"
               button-label="Close" :full="true" size="lg" />
-            <ButtonElement button-class="bg-brand-500" name="register" :columns="{ container: 4 }" :submits="true"
-              button-label="Submit" :full="true" size="lg" />
+            <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register" :columns="{ container: 4 }"
+              :submits="true" button-label="Submit" :full="true" size="lg" />
           </Vueform>
         </client-only>
       </div>
@@ -104,6 +104,7 @@ const rugsStore = useRugStore();
 const clientStore = useClientsStore();
 const finishedProductStore = useFinishedProductsStore();
 const snackbar = useSnackbar();
+const isLoading = computed(() => finishedProductStore.isLoading)
 
 const imageSrc = ref(null);
 
