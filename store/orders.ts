@@ -1,5 +1,5 @@
 import type { AuthResponse, LoginCredentials, User } from "~/utils/models/auth";
-import type { OrderData, OrdersResponse, CreateOrderRequest, CreateOrderResponse, Order, StartProductionRequest } from "~/utils/models/order";
+import type { OrderData, OrdersResponse, CreateOrderRequest, CreateOrderResponse, Order, StartProductionRequest, DeliverOrderRequest, OrderResponse } from "~/utils/models/order";
 
 export const useOrderStore = defineStore("order", {
     state: () => ({
@@ -15,6 +15,7 @@ export const useOrderStore = defineStore("order", {
         orderImage: null as File | null,  // Add orderImage to the state
         clientOrderFile: {} as File,  // Add clientOrderFiles to the 
         startProductionForm: {} as StartProductionRequest,  // Add startProductionForm to the state
+        deliverOrderForm: {} as DeliverOrderRequest,  // Add startProductionForm to the state
     }),
 
     actions: {
@@ -174,6 +175,27 @@ export const useOrderStore = defineStore("order", {
             }
         },
 
+        //get single order
+        async getSingleOrder(id: number) {
+            this.isLoading = true;
+            if (!this.token) return;
+            try {
+                const response = await $fetch<OrderResponse>(getApiUrl(`client/orders/${id}`), {
+                    headers: { Authorization: `Bearer ${this.token}` },
+                });
+
+                if (response?.response) {
+                    this.selectedOrder = response.response;  // Assuming the response contains a 'orders' array
+                    // console.log("Clients data:", this.orders);
+                }
+            } catch (err) {
+                console.error("Error fetching orders:", err);
+                this.errorMessage = "An error occurred while fetching order data";
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
 
         //delete order
         async deleteOrder() {
@@ -229,6 +251,37 @@ export const useOrderStore = defineStore("order", {
             }
         },
 
+        //deliver order
+        async deliverOrder() {
+            this.isLoading = true;
+            if (!this.token) return;
+            try {
+                this.deliverOrderForm.order_id = this.selectedOrder?.id ?? 0; // Set the order ID in the form data
+                const response = await $fetch<CreateOrderResponse>(getApiUrl(`client/orders/${this.selectedOrder?.id}/deliver`), {
+                    method: "POST",
+                    body: this.deliverOrderForm,
+                    headers: { Authorization: `Bearer ${this.token}` },
+                });
+
+                if (response?.response) {
+                    console.log("Production started successfully:", response.response);
+                    this.successMessage = response.message;
+                    this.orders.data = this.orders.data.map(order =>
+                        order.id === this.selectedOrder?.id ? { ...order, ...response.response } : order
+                    );
+                    //update spec
+                }
+            } catch (error) {
+                // Handle API error
+                const errorMsg = handleApiError(error);
+                console.log("Error starting production:", errorMsg);
+                this.errorMessage = errorMsg.errorMessage || "An error occurred while starting production";
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+
         //process order
 
 
@@ -244,6 +297,16 @@ export const useOrderStore = defineStore("order", {
             console.log("Form reset successfully");
         },
 
+        //reset deliver form 
+        resetDeliverForm() {
+            this.deliverOrderForm = {} as DeliverOrderRequest;  // Reset the form state
+            this.errors = {};  // Reset errors
+            this.successMessage = null;  // Reset success message
+            this.errorMessage = null;  // Reset order image
+            this.selectedOrder = null;  // Reset selected order
+
+        },
+
         //reset start prod form
         resetStartProductionForm() {
             this.startProductionForm = {} as StartProductionRequest,
@@ -251,13 +314,21 @@ export const useOrderStore = defineStore("order", {
             this.successMessage = null;  // Reset success message
             this.errorMessage = null;  // Reset error message
             this.orderImage = null;  // Reset order image
-            this.selectedOrder = null;
         },
         // setSelectedClientProfile
         setSelectedOrder(order: Order) {
             this.selectedOrder = order;  // Set the selected order profile
             //set state form with selected order data
             this.createOrderForm = order
+        },
+
+
+        setDeliverOrderForm(order: Order) {
+            this.deliverOrderForm = {
+                ...this.deliverOrderForm,
+                order_id: order.id,
+
+            }
         },
 
         //set file

@@ -8,20 +8,45 @@
                 tableStyle="min-width: 50rem" :globalFilterFields="['id', 'rug.name', 'status', 'size.name']">
     
                 <template #header>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center ">
+                        <!-- Add New Order Button -->
+                        <div>
     
+    
+                        </div>
+                        <!-- Filters -->
+                        <div class="flex-1 flex justify-center">
+                            <div
+                                class="flex space-x-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-full border border-gray-300">
+                                <button v-for="status in ['All', ...productionStatuses]" :key="status"
+                                    @click="applyStatusFilter(status)" :class="[ 
+                              'px-3 py-1 text-sm font-medium rounded-full transition-colors', 
+                              selectedStatus === status
+                                ? 'bg-white text-indigo-600 shadow border border-gray-300'
+                                : 'text-gray-600 hover:text-indigo-600'
+                            ]">
+                                    {{ status }}
+                                </button>
+                            </div>
+                        </div>
     
                         <!-- Search input -->
-                        <div class="flex justify-end">
-                            <IconField>
-                                <InputIcon>
-                                    <i class="pi pi-search" />
-                                </InputIcon>
-                                <InputText v-if="filters" v-model="filters['global'].value"
-                                    placeholder="Search Production" />
-                            </IconField>
+                        <div class="flex justify-between items-center">
+    
+    
+                            <!-- Search input -->
+                            <div class="flex justify-end">
+                                <IconField>
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText v-if="filters" v-model="filters['global'].value"
+                                        placeholder="Search Production" />
+                                </IconField>
+                            </div>
                         </div>
                     </div>
+    
                 </template>
     
                 <!-- Order ID Column with Filter -->
@@ -196,6 +221,7 @@ import { useDateFormat } from '~/composables/useDateFomat';
 import StartProductionFormModal from '~/components/orders/modals/StartProductionFormModal.vue'
 import { useProductionStore } from '~/store/production'
 import type { WorkInProgress } from '~/utils/models/production'
+import { productionStatuses } from '~/utils/data/colors'
 
 const { formatCurrency } = useCurrency();
 const { formatDate, formatDateString } = useDateFormat();
@@ -242,6 +268,9 @@ const handleViewProductionModal = (workInProgress: WorkInProgress) => {
 
 }
 
+const selectedStatus = ref('all');
+
+
 const filters: any = ref({
   global: {
     value: null,
@@ -264,6 +293,15 @@ const filters: any = ref({
     matchMode: FilterMatchMode.EQUALS
   },
 });
+
+function applyStatusFilter(status: string) {
+  selectedStatus.value = status
+
+  // clear / set the table filter
+  filters.value.status.value =
+    status === 'All' ? null : status.toLowerCase()
+}
+
 
 
 const sizeOptions = ref([

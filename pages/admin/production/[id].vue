@@ -30,43 +30,43 @@
         <!-- Tab Headers -->
         <TabList>
           <Tab value="0">
-            <span class="inline-flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 text-sm">
               <PendingIcon />
               Production Details
             </span>
           </Tab>
           <Tab value="1">
-            <span class="inline-flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 text-sm">
               <ShopIcon />
               Order Details
             </span>
           </Tab>
           <Tab value="2">
-            <span class="inline-flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 text-sm">
               <UsersIcon />
               Client Details
             </span>
           </Tab>
           <Tab value="3">
-            <span class="inline-flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 text-sm">
               <ShopBag />
               Rug Details
             </span>
           </Tab>
           <Tab value="4">
-            <span class="inline-flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 text-sm">
               <BoxCubeIcon />
               Raw Materials
             </span>
           </Tab>
           <Tab value="5">
-            <span class="inline-flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 text-sm">
               <BoxCubeIcon />
               Product
             </span>
           </Tab>
           <Tab value="6">
-            <span class="inline-flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 text-sm">
               <ClipBoardIcon />
               Summary
             </span>
@@ -158,13 +158,13 @@
               :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials" stripedRows tableStyle="min-width: 50rem"
               @row-edit-save="onRowEditSave"
               :pt="{
-                                                                                                                                                                        table: { style: 'min-width: 50rem' },
-                                                                                                                                                                        column: {
-                                                                                                                                                                            bodycell: ({ state }) => ({
-                                                                                                                                                                                style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
-                                                                                                                                                                            })
-                                                                                                                                                                        }
-                                                                                                                                                                    }">
+                                                                                                                                                                                                              table: { style: 'min-width: 50rem' },
+                                                                                                                                                                                                              column: {
+                                                                                                                                                                                                                  bodycell: ({ state }) => ({
+                                                                                                                                                                                                                      style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
+                                                                                                                                                                                                                  })
+                                                                                                                                                                                                              }
+                                                                                                                                                                                                          }">
               <template #header>
                 <div class="flex justify-between items-center" v-if="!isProductionDone">
                   <!-- Button aligned to the left -->
@@ -263,48 +263,71 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No Product"
                   class="w-40 h-40 opacity-60" />
                 <p class="text-xl font-semibold">No product uploaded</p>
-                <button
-                  class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-md transition duration-200"
-                  @click="setProductForm();isFinishedProductFormModal =true">
-                  Upload Product
-                </button>
+  
+  
+                <CustomButton prefixIcon variant="primary" class="w-full p-button-rounded p-button-sm" label="Add Product"
+                  @click="setProductForm(workInProgress)">
+                  <template #prefix>
+                    <PlugInIcon :width="20" :height="20" />
+                  </template>
+                </CustomButton>
+  
               </div>
             </div>
   
-            <div v-else class="flex-col md:flex-row justify-between flex gap-4 items-start mx-4 py-12">
-              <div class="flex bg-white rounded-lg shadow dark:bg-gray-800 flex-col md:flex-row">
-                <!-- Image -->
-                <div class="relative w-full md:w-48 flex justify-center items-center">
-                  <img :src="product.default_image" alt="Product image"
-                    class="object-cover w-full h-48 md:h-full rounded-t-lg md:rounded-l-lg md:rounded-t-none" />
+            <div v-else class="flex flex-col md:flex-row justify-between items-stretch gap-4 mx-4 py-12">
+              <!-- PRODUCT DETAILS CARD -->
+              <div class="flex bg-white rounded-lg shadow dark:bg-gray-800 flex-col md:flex-row flex-1 overflow-hidden">
+                <!-- Image Wrapper -->
+                <div class="flex-shrink-0 w-full md:w-1/2 p-2 flex justify-center items-center">
+                  <img v-if="product.default_image" :src="`${config.public.imageUrl}${product.default_image}`"
+                    alt="Product image" class="w-full h-full object-cover rounded-2xl shadow-md" />
                 </div>
-  
                 <!-- Product Info -->
-                <div class="flex-auto p-6">
+                <div class="flex-auto p-6 flex flex-col">
                   <h1 class="text-2xl font-bold dark:text-white mb-2">{{ product.name }}</h1>
                   <p class="text-gray-600 dark:text-gray-300 mb-4">{{ product.description }}</p>
-                  <!-- <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-12">
-                                  <InfoField label="Delivery Date"
-                                    :value="formatDateString(workInProgress.order?.delivery_date) ?? 'N/A'" />
-                                  <InfoField label="Start Date" :value="formatDateString(workInProgress?.start_date)" />
-                                  <InfoField label="Finishing Date" :value="formatDateString(workInProgress?.approx_end_date)" />
-                                  <InfoField label="Production Cost" :value="formatCurrency(workInProgress?.approx_production_cost)" />
-                                </div> -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 dark:text-gray-200">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 dark:text-gray-200 flex-grow">
                     <InfoField label="Production Cost" :value="formatCurrency(product.actual_production_cost) ?? 'N/A'" />
                     <InfoField label="Total Price" :value="formatCurrency(product.total_price) ?? 'N/A'" />
                     <InfoField label="Size"
-                      :value="`${product.length} x ${product.width } ${ product.unit} (${product.shape})`" />
+                      :value="`${product.length} x ${product.width} ${product.unit} (${product.shape})`" />
                   </div>
-  
                   <div class="mt-6">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Rug Colors</h4>
                     <ColorPalertView :colors="product?.order?.color_palet" />
                   </div>
+                </div>
+              </div>
   
+              <!-- DATES & ACTIONS CARD -->
+              <div class="w-full md:w-1/3 bg-white rounded-lg shadow dark:bg-gray-800 flex flex-col p-6">
+                <!-- Dates Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 dark:text-gray-200 flex-1">
+                  <InfoField label="Start Date" :value="formatDateString(product.start_date) ?? 'N/A'" />
+                  <InfoField label="End Date" :value="formatDateString(product.end_date) ?? 'N/A'" />
+                  <InfoField label="Created At" :value="formatDateString(product.created_at) ?? 'N/A'" />
+                  <InfoField label="Updated At" :value="formatDateString(product.updated_at) ?? 'N/A'" />
+                  <InfoField label="Available Units" :value="`${product.available_quantity} units`" />
+                </div>
+                <!-- Edit/Delete Buttons -->
+                <div class="mt-4 flex flex-row gap-2">
+                  <CustomButton prefixIcon variant="primary" class="w-full p-button-rounded p-button-sm" label="Edit"
+                    @click="oenEditProduct(product)">
+                    <template #prefix>
+                      <PencilIcon :width="20" :height="20" />
+                    </template>
+                  </CustomButton>
+                  <CustomButton prefixIcon variant="danger" class="w-full p-button-rounded p-button-sm" label="Delete"
+                    @click="">
+                    <template #prefix>
+                      <TrashIcon :width="20" :height="20" />
+                    </template>
+                  </CustomButton>
                 </div>
               </div>
             </div>
+  
           </TabPanel>
   
           <TabPanel value="6">
@@ -396,6 +419,7 @@
   
   
     <AddFinishedProductModal :isFinishedProductFormModal="isFinishedProductFormModal" :product="product"
+      :workInProgress="workInProgress"
       @update:isFinishedProductFormModal="(value) => isFinishedProductFormModal = value" />
   
   </admin-layout>
@@ -427,13 +451,16 @@ import ArrrowUTurnIcon from '~/icons/ArrrowUTurnIcon.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import DoneProductionModal from '@/components/production/modals/DoneProductionModal.vue'
 import AddFinishedProductModal from '@/components/production/modals/AddFinishedProductModal.vue'
-import type { AddWorkInProgressMaterialRequest, UpdateWorkInProgress } from '~/utils/models/production'
+import type { AddWorkInProgressMaterialRequest, UpdateWorkInProgress, WorkInProgressData } from '~/utils/models/production'
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
 import { useMaterialStore } from '~/store/material'
 
 import type { Material } from '~/utils/models/materials'
 import { useFinishedProductsStore } from '~/store/finished_products'
+import PencilIcon from '~/icons/PencilIcon.vue'
+import { PlugInIcon, TrashIcon } from '~/icons'
+import type { FinishedProduct } from '~/utils/models/finished_products'
 
 
 const { formatCurrency } = useCurrency();
@@ -587,7 +614,6 @@ const handleConfirmation = async (isConfirmed: boolean) => {
         });// Emit success event
         // closeModal(); // Close the modal
       }
-
       console.log(productionStore.errorMessage);
       if (productionStore.errorMessage) {
         snackbar.add({
@@ -596,10 +622,8 @@ const handleConfirmation = async (isConfirmed: boolean) => {
         });// Emit success event
         // closeModal(); // Close the modal
       }
-
     } catch (error) {
       console.log('Error 2')
-
     }
   } else {
     console.log("Action canceled.");
@@ -669,8 +693,16 @@ const overallMaterialCost = computed(() =>
   groupedMaterials.value.reduce((sum, group) => sum + group.totalCost, 0)
 );
 
-const setProductForm = () => {
-  finishedProductStore.setProductForm(workInProgress)
+const setProductForm = (workInProgress: WorkInProgressData) => {
+
+  isFinishedProductFormModal.value = true
+
+};
+
+const oenEditProduct = (product: FinishedProduct) => {
+  finishedProductStore.setEditProductForm(product);
+
+  isFinishedProductFormModal.value = true;
 }
 
 </script>

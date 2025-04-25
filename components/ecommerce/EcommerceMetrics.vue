@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import ShopBag from '~/icons/ShopBag.vue';
-
-</script>
 
 <template>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
@@ -31,7 +27,7 @@ import ShopBag from '~/icons/ShopBag.vue';
       <div class="flex items-end justify-between mt-5">
         <div>
           <span class="text-sm text-gray-500 dark:text-gray-400">Customers</span>
-          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">3,782</h4>
+          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{dashboardData.total_customers}}</h4>
         </div>
 
         <span
@@ -53,7 +49,7 @@ import ShopBag from '~/icons/ShopBag.vue';
             />
           </svg>
 
-          11.01%
+          0.00%
         </span>
       </div>
     </div>
@@ -84,7 +80,7 @@ import ShopBag from '~/icons/ShopBag.vue';
       <div class="flex items-end justify-between mt-5">
         <div>
           <span class="text-sm text-gray-500 dark:text-gray-400">Orders</span>
-          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">5,359</h4>
+          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{dashboardData.total_orders}}</h4>
         </div>
 
         <span
@@ -106,7 +102,7 @@ import ShopBag from '~/icons/ShopBag.vue';
             />
           </svg>
 
-          9.05%
+          0.00%
         </span>
       </div>
     </div>
@@ -126,8 +122,8 @@ import ShopBag from '~/icons/ShopBag.vue';
 
       <div class="flex items-end justify-between mt-5">
         <div>
-          <span class="text-sm text-gray-500 dark:text-gray-400">Rugs</span>
-          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">5,359</h4>
+          <span class="text-sm text-gray-500 dark:text-gray-400">Sales</span>
+          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{formatCurrency(dashboardData.total_sales)}}</h4>
         </div>
 
         <span
@@ -149,9 +145,22 @@ import ShopBag from '~/icons/ShopBag.vue';
             />
           </svg>
 
-          9.05%
+          0.00%
         </span>
       </div>
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { defineProps, defineEmits } from 'vue';
+const { formatCurrency } = useCurrency();
+
+const props = defineProps({
+  dashboardData: {
+    type: Object,
+    required: true,
+  },
+  
+});
+
+</script>

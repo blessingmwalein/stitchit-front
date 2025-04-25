@@ -8,7 +8,7 @@
     >
         <span v-if="isLoading" class="loader mr-2"></span>
         <slot name="prefix" v-if="prefixIcon" />
-        <span>{{ label }}</span>
+        <span class="px-2">{{ label }}</span>
         <slot name="suffix" v-if="suffixIcon" />
     </button>
 </template>

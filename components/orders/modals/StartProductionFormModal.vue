@@ -148,7 +148,7 @@ const startProductionForm = computed({
 const closeModal = () => {
 
   //clear form data
-  orderStore.setSelectedOrder(null);
+  // orderStore.setSelectedOrder(null);
   orderStore.resetStartProductionForm();
   emit('update:isStartProductionFormModal', false);
 };

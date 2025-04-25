@@ -28,17 +28,19 @@ export interface FinishedProduct {
     default_image: string;
     work_in_progress_id: number;
     actual_production_cost: number;
-    rug_id: null;
+    rug_id: number | null;
     total_price: number;
     unit: string;
+    start_date: string;
+    end_date: string;
     shape: string;
     length: number;
     width: number;
     materials_cost: number;
     labour_cost: number;
     rug: Rug;
-    created_at: Date;
-    updated_at: Date;
+    created_at: string;
+    updated_at: string;
 }
 
 
@@ -64,14 +66,14 @@ export interface Meta {
 
 
 export interface CreateFinishedProductRequest {
-    id: string;
+    id: number | null;
     name: string;
-    order_id: string;
-    work_in_progress_id: string;
-    rug_id: string;
+    order_id: number;
+    work_in_progress_id: number;
+    rug_id: number;
     description: string;
-    available_quantity: string;
-    default_image: File | null;
+    available_quantity: number;
+    default_image: File | null | string;
     total_price: number;
     unit: 'cm' | string;
     shape: 'rectangle' | string;
@@ -83,4 +85,28 @@ export interface CreateFinishedProductResponse {
     success: boolean;
     message: string;
     response: FinishedProduct;
+}
+
+
+export interface DasbhoardDataResponse {
+    success:  boolean;
+    message:  string;
+    response: DashboardData;
+}
+
+export interface DashboardData {
+    total_finished_products: number;
+    total_sales:             string;
+    total_orders:            number;
+    total_customers:         number;
+}
+export interface SalesMonthlyDataResponse {
+    success:  boolean;
+    message:  string;
+    response: SalesData[];
+}
+
+export interface SalesData {
+    month:       number;
+    total_sales: string;
 }

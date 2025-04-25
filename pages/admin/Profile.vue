@@ -1,7 +1,7 @@
 <template>
     <admin-layout>
         <PageBreadcrumb :pageTitle="currentPageTitle" />
-
+    
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
             <!-- <h3 class="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">Profile</h3> -->
             <profile-card />
@@ -29,23 +29,23 @@ const isLoading = computed(() => authStore.isLoading);
 const userProfile = computed(() => authStore.user);
 
 onMounted(() => {
-    isMounted.value = true // Set to true once component is mounted
+  isMounted.value = true // Set to true once component is mounted
 })
 
 definePageMeta({
-    middleware: [
-        function (to, from) {
-            // Custom inline middleware
-        },
-        'auth',
-    ],
+  middleware: [
+    function (to, from) {
+      // Custom inline middleware
+    },
+    'auth',
+  ],
 });
 
 const currentPageTitle = ref('User Profile')
 
 onMounted(async () => {
-    if (!authStore.user && authStore.token) {
-        await authStore.fetchUser(); // Fetch only if user is not loaded
-    }
+  if (!authStore.user && authStore.token) {
+    await authStore.fetchUser(); // Fetch only if user is not loaded
+  }
 });
 </script>

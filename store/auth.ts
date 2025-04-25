@@ -1,9 +1,12 @@
-import type { AuthResponse, LoginCredentials, User } from "~/utils/models/auth";
-
-export const useAuthStore = defineStore("auth", {
+import { defineStore } from 'pinia'
+import { useCookie } from '#imports'
+import { useRouter } from 'vue-router'
+import type { AuthResponse, LoginCredentials, ProfileResponse, User } from '~/utils/models/auth'
+import { getApiUrl } from '~/utils/api'
+export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null as User | null,
-    token: useCookie<string | null>("auth_token").value || null,
+    token: useCookie<string | null>('auth_token').value || null,
     successMessage: null as string | null,
     errorMessage: null as string | null,
     errors: {} as Record<string, string>,
@@ -11,102 +14,98 @@ export const useAuthStore = defineStore("auth", {
     loginForm: {} as LoginCredentials,
   }),
 
+  getters: {
+    isLoggedIn: (state) => !!state.token,
+  },
+
   actions: {
     async login() {
-      this.isLoading = true;
-      this.resetMessages();
+      this.isLoading = true
+      this.resetMessages()
+
       try {
-        const { data, error } = await useFetch<AuthResponse>(getApiUrl("auth/admin/login"), {
-          method: "POST",
+        const data = await $fetch<AuthResponse>(getApiUrl('auth/admin/login'), {
+          method: 'POST',
           body: this.loginForm,
-        });
+        })
 
-        if (error.value) {
-          const response = handleApiError(error.value);
-          this.setMessages(response);
-          return;
+        if (!data.response?.token) {
+          throw new Error(data.message || 'Login failed')
         }
 
-        if (data.value?.response.token) {
-          this.token = data.value.response.token;
-          this.user = data.value.response.user;
-          this.successMessage = "Login successful";
-          useCookie("auth_token", { maxAge: 60 * 60 * 24 * 7 }).value = data.value.response.token;
+        this.token = data.response.token
+        this.user  = data.response.user
+        useCookie('auth_token', { maxAge: 60 * 60 * 24 * 7 }).value = data.response.token
+        this.successMessage = 'Login successful'
 
-          // Fetch user after login
-          await this.fetchUser();
-        }
+        // Fetch full profile
+        await this.fetchUser()
+      } catch (err: any) {
+        const resp = handleApiError(err)
+        this.setMessages(resp)
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
     },
 
     async fetchUser() {
-      this.isLoading = true;
-      if (!this.token) return;
+      if (!this.token) return
+      this.isLoading = true
       try {
-        const { data, error } = await useFetch<ProfileResponse>(getApiUrl("auth/admin/profile"), {
+        const data = await $fetch<ProfileResponse>(getApiUrl('auth/admin/profile'), {
+          method: 'GET',
           headers: { Authorization: `Bearer ${this.token}` },
-        });
+        })
 
-        console.log("User data:", data.value, error.value);
-
-        if (error.value) {
-          const response = handleApiError(error.value);
-          this.setMessages(response);
-          return;
+        if (data.response) {
+          this.user = data.response
+        } else {
+          throw new Error(data.message || 'Failed to fetch profile')
         }
-
-        if (data.value) {
-          this.successMessage = data.value.message || null;
-          // return;
-        }
-
-        this.user = data.value.response || null;
-      } catch (err) {
-        this.errorMessage = "An error occurred while fetching user data";
-        this.isLoading = false;
+      } catch (err: any) {
+        const resp = handleApiError(err)
+        this.setMessages(resp)
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
     },
 
-    //setMessages
+    logout() {
+      // clear cookie
+      const cookie = useCookie('auth_token')
+      cookie.value = null
+      cookie.delete()
+
+      // reset store state
+      this.user = null
+      this.token = null
+      this.resetMessages()
+      this.resetForm()
+
+      // redirect to login
+      const router = useRouter()
+      router.push({ name: 'login' })
+    },
+
     setMessages(response: any) {
-      if (response.errorMessage) {
-        this.errorMessage = response.errorMessage;
-      } else if (response.successMessage) {
-        this.successMessage = response.successMessage;
-      } else if (response.errors) {
-        this.errors = response.errors;
-      }
+      this.errorMessage   = response.errorMessage   || null
+      this.successMessage = response.successMessage || null
+      this.errors         = response.errors         || {}
     },
-
-    // resetMessages
 
     resetMessages() {
-      this.successMessage = null;
-      this.errorMessage = null;
-      this.errors = {};
+      this.successMessage = null
+      this.errorMessage   = null
+      this.errors         = {}
     },
 
-    //reset form
     resetForm() {
-      this.loginForm = {} as LoginCredentials;
-      this.successMessage = null;
-      this.errorMessage = null;
-      this.errors = {};
-    },
-  },
-
-  getters: {
-    isLoggedIn(): boolean {
-      return !!this.token;
+      this.loginForm      = {} as LoginCredentials
     },
   },
 
   persist: {
     enabled: true,
-    strategies: [{ storage: "cookies", key: "auth" }],
+    strategies: [{ storage: 'cookies', key: 'auth' }],
   },
-});
+})

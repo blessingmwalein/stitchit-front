@@ -11,7 +11,6 @@
         <slot></slot>
       </div>
     </div>
-    <NuxtSnackbar />
 
   </div>
 </template>
