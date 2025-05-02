@@ -22,7 +22,7 @@
         </template>
         <template #body>
             <div class="no-scrollbar relative w-full  overflow-y-auto bg-white  dark:bg-gray-900">
-                <client-only>
+            <client-only>
                     <div class="mb-4">
                         <Alert v-if="ordersStore.errorMessage" variant="error" title="Something went wrong"
                             :message="ordersStore.errorMessage ?? ''" :showLink="false" />

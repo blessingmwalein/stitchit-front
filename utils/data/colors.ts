@@ -30,6 +30,7 @@ export const colorsData = [
     { value: 'aubergine', label: 'Aubergine' },
     { value: 'khaki', label: 'Khaki' },
     { value: 'fuchsia', label: 'Fuchsia' },
+    { value: 'cloud blue', label: 'Cloud Blue' },
 ];
 
 //shapes data 

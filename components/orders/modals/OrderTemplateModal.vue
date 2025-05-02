@@ -34,7 +34,7 @@
         </template>
     
         <template #body>
-    
+            
             <div ref="pdfContent"
                 class="max-w-4xl mx-auto bg-white font-sans text-sm border border-gray-300 shadow-md overflow-hidden">
                 <!-- Header -->
@@ -64,7 +64,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <InfoField label="Name" :value="order.client_name" />
                         <!-- <InfoField label="Gender" :value="order.gender" /> -->
-                        <InfoField label="Email" :value="order.email" />
+                        <!-- <InfoField label="Email" :value="order.email" /> -->
                         <InfoField label="Phone" :value="order.phone_number" />
                         <InfoField label="City" :value="order.city" />
                         <InfoField label="Address" :value="order.address" />
@@ -126,7 +126,7 @@
                         <h2 class="font-semibold text-lg mb-2">Payment Details</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <InfoField label="Total Price" :value="formatCurrency(order?.total_price)" />
-                            <InfoField label="Deposit Required" value="50%" />
+                            <InfoField label="Deposit Required" value="$20" />
                             <InfoField label="Payment Method" value="Cash, InnBucks, Ecocash" />
                         </div>
                     </div>
@@ -135,19 +135,46 @@
                         <h3 class="font-semibold text-lg mb-2">Terms</h3>
                         <ul class="list-disc list-inside text-sm">
                             <li>Delivery date: {{ formatDateString(order.delivery_date) }}</li>
-                            <li>50% deposit required before processing</li>
+                            <li>$20 deposit required before processing</li>
                             <li>Balance payable upon delivery</li>
                         </ul>
                     </div>
                 </div>
     
                 <!-- Bank Info -->
-                <div class="px-4 py-6 border border-gray-200 rounded-2xl m-2 ">
-                    <h3 class="font-semibold text-lg mb-2">Bank Details</h3>
-                    <p><strong>Account Name:</strong> Stich It</p>
-                    <p><strong>Bank:</strong> CBZ Bank</p>
-                    <p><strong>Account Number:</strong> 1234567890</p>
-                    <p><strong>Branch:</strong> Westgate</p>
+                <div class="sm:col-span-3 py-6 space-y-4 px-4">
+                    <label class="font-semibold block mb-2">Payment Methods</label>
+                    <div class="flex flex-wrap justify-start gap-4 px-4 py-2">
+                        <!-- Cash -->
+                        <div class="w-60 border border-gray-300 rounded-2xl shadow-md p-4 flex items-center gap-4">
+                            <img src="/images/payments/cash.png" alt="Cash" class="h-12 w-12 object-contain" />
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Cash</h4>
+                                <p class="text-sm text-gray-600">Pay in person</p>
+                            </div>
+                        </div>
+    
+                        <!-- Ecocash -->
+                        <div class="w-60 border border-gray-300 rounded-2xl shadow-md p-4 flex items-center gap-4">
+                            <img src="/images/payments/ecocash.png" alt="Ecocash" class="h-12 w-12 object-contain" />
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Ecocash</h4>
+                                <p class="text-sm text-gray-600">Blessing Mwale</p>
+                                <p class="text-sm text-gray-600">07724400088</p>
+                            </div>
+                        </div>
+    
+                        <!-- InnBucks -->
+                        <div class="w-60 border border-gray-300 rounded-2xl shadow-md p-4 flex items-center gap-4">
+                            <img src="/images/payments/inbukks.png" alt="InnBucks" class="h-12 w-12 object-contain" />
+                            <div>
+                                <h4 class="font-semibold text-gray-800">InnBucks</h4>
+                                <p class="text-sm text-gray-600">Blessing Mwale</p>
+                                <p class="text-sm text-gray-600">07724400088</p>
+                            </div>
+                        </div>
+                    </div>
+    
                 </div>
     
                 <!-- Signature -->
@@ -177,7 +204,7 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
 import { useRuntimeConfig } from "#app";
-
+// import html2pdf from 'html2pdf.js';
 
 import Modal from '@/components/profile/Modal.vue';
 import type { Order } from '~/utils/models/order';
@@ -221,45 +248,48 @@ const closeModal = () => {
 
 const pdfContent = ref<HTMLElement | null>(null);
 
+// const printPDf = async () => {
+//   if (!pdfContent.value) {
+//     console.error("PDF content not found");
+//     return;
+//   }
+
+//   const options = {
+//     margin: 0.5,
+//     filename: `Order-${props.order?.order_number || "invoice"}.pdf`,
+//     image: { type: "jpeg", quality: 0.98 },
+//     html2canvas: {
+//       scale: 2,
+//       useCORS: true,
+//       allowTaint: true, // optional, depending on CORS images
+//     },
+//     jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+//   };
+
+//   try {
+//     await html2pdf()
+//       .set(options)
+//       .from(pdfContent.value)
+//       .save();
+//   } catch (err) {
+//     console.error("Failed to generate PDF:", err);
+//   }
+// };
+
 const exportToPDF = async () => {
-  //   if (!pdfContent.value || !props.order?.image_url) return;
+    if (!pdfContent.value || !props.order?.image_url) return;
 
-  //   //   const imgEl = pdfContent.value.querySelector("#orderImage");
-  //   //   if (imgEl instanceof HTMLImageElement) {
-  //   //     try {
-  //   //       const base64Image = await convertImageToBase64(`${config.public.imageUrl}${props.order.image_url}`);
-  //   //       imgEl.src = base64Image;
-  //   //     } catch (error) {
-  //   //       console.error("Error converting image to base64:", error);
-  //   //     }
-  //   //   }
+    //   const imgEl = pdfContent.value.querySelector("#orderImage");
+    //   if (imgEl instanceof HTMLImageElement) {
+    //     try {
+    //       const base64Image = await convertImageToBase64(`${config.public.imageUrl}${props.order.image_url}`);
+    //       imgEl.src = base64Image;
+    //     } catch (error) {
+    //       console.error("Error converting image to base64:", error);
+    //     }
+    //   }
 
-  //   const options = {
-  //     margin: 0.5,
-  //     filename: `Order-${props.order?.order_number || "invoice"}.pdf`,
-  //     image: { type: "jpeg", quality: 0.98 },
-  //     html2canvas: {
-  //       scale: 2,
-  //       useCORS: true
-  //     },
-  //     jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-  //   };
 
-  //   // Generate the PDF as a Blob
-  //   const pdfBlob = await new Promise<Blob>((resolve, reject) => {
-  //     html2pdf()
-  //       .set(options)
-  //       .from(pdfContent.value)
-  //       .toPdf()
-  //       .get('blob')
-  //       .then(resolve)
-  //       .catch(reject);
-  //   });
-
-  //   // Create a file object from the Blob (optional: you can use the Blob directly if not needed as File)
-  //   const pdfFile = new File([pdfBlob], `Order-${props.order?.order_number || "invoice"}.pdf`, {
-  //     type: "application/pdf"
-  //   });
 
   //   // Update the state with the generated PDF file (assuming you're using React state)
   //   orderStore.setClientOrderFile(pdfFile);  // assuming setFile is your state setter function
