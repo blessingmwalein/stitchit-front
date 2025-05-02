@@ -715,3 +715,9 @@ const oenEditProduct = (product: FinishedProduct) => {
 }
 
 </script>
+
+<style lang="css" scoped>
+.p-tablist-active-bar {
+    z-index: 0;
+}
+</style>

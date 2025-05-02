@@ -18,7 +18,7 @@
         </div>
   
         <!-- Tabs -->
-        <div class="mb-4 flex gap-3 border-b pb-2">
+        <div class="mb-4 flex gap-3 border-b border-gray-200 pb-2">
           <Skeleton width="6rem" height="1.5rem" />
           <Skeleton width="6rem" height="1.5rem" />
           <Skeleton width="6rem" height="1.5rem" />
