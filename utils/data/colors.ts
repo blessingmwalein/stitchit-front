@@ -23,7 +23,7 @@ export const colorsData = [
     { value: 'charcoal', label: 'Charcoal' },
     { value: 'lavender', label: 'Lavender' },
     { value: 'coral', label: 'Coral' },
-    { value: 'mustard', label: 'Mustard' },
+    { value: 'gold', label: 'Mustard' },
     { value: 'olive', label: 'Olive' },
     { value: 'indigo', label: 'Indigo' },
     { value: 'peach', label: 'Peach' },
