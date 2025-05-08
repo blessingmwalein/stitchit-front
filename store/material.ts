@@ -1,5 +1,6 @@
 import type { AuthResponse, LoginCredentials, User } from "~/utils/models/auth";
 import type { CreateMaterialRequest, CreateMaterialResponse, Material, MaterialData, MaterialResponse, MaterialType, MaterialTypeData, MaterialTypeResponse } from "~/utils/models/materials";
+import type { CreateResponse } from "~/utils/models/rug";
 
 export const useMaterialStore = defineStore("material", {
     state: () => ({
@@ -55,8 +56,6 @@ export const useMaterialStore = defineStore("material", {
             this.isLoading = true;
             if (!this.token) return;
             try {
-
-
                 const response = await $fetch<CreateResponse>(getApiUrl(`materials/${this.selectedMaterial?.id}`), {
                     method: "PUT",
                     body: {

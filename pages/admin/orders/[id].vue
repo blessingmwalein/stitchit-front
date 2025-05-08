@@ -104,17 +104,17 @@
     
                             <!-- Production Details -->
                             <!-- <TabPanel value="0">
-                                                                                    <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
-                                                                                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Order Details</h4>
-                                                                                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-12">
-                                                                                            <InfoField label="Delivery Date"
-                                                                                                :value="formatDateString(order.order?.delivery_date) ?? 'N/A'" />
-                                                                                            <InfoField label="Start Date" :value="formatDateString(order?.start_date)" />
-                                                                                            <InfoField label="Finishing Date" :value="formatDateString(order?.approx_end_date)" />
-                                                                                            <InfoField label="Production Cost" :value="formatCurrency(order?.approx_production_cost)" />
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </TabPanel> -->
+                                                                                                <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+                                                                                                    <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Order Details</h4>
+                                                                                                    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-12">
+                                                                                                        <InfoField label="Delivery Date"
+                                                                                                            :value="formatDateString(order.order?.delivery_date) ?? 'N/A'" />
+                                                                                                        <InfoField label="Start Date" :value="formatDateString(order?.start_date)" />
+                                                                                                        <InfoField label="Finishing Date" :value="formatDateString(order?.approx_end_date)" />
+                                                                                                        <InfoField label="Production Cost" :value="formatCurrency(order?.approx_production_cost)" />
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </TabPanel> -->
     
                             <!-- Order Details -->
                             <TabPanel value="0">
@@ -245,11 +245,11 @@
                                         <div class="mt-4 flex flex-row gap-2">
     
                                             <!-- <CustomButton prefixIcon variant="danger" class="w-full p-button-rounded p-button-sm"
-                                                                                        label="Delete" @click="">
-                                                                                        <template #prefix>
-                                                                                            <TrashIcon :width="20" :height="20" />
-                                                                                        </template>
-                                                                                    </CustomButton> -->
+                                                                                                    label="Delete" @click="">
+                                                                                                    <template #prefix>
+                                                                                                        <TrashIcon :width="20" :height="20" />
+                                                                                                    </template>
+                                                                                                </CustomButton> -->
                                         </div>
                                     </div>
                                 </div>
@@ -300,11 +300,11 @@
                                                             <span
                                                                 class="inline-block px-2 py-1 rounded-full text-xs font-semibold"
                                                                 :class="{
-                                                  'bg-green-100 text-green-700': tx.status === 'completed',
-                                                  'bg-yellow-100 text-yellow-800': tx.status === 'pending',
-                                                  'bg-red-100 text-red-700': tx.status === 'failed',
-                                                  'bg-gray-100 text-gray-700': !['completed', 'pending', 'failed'].includes(tx.status)
-                                                }">
+                                                              'bg-green-100 text-green-700': tx.status === 'completed',
+                                                              'bg-yellow-100 text-yellow-800': tx.status === 'pending',
+                                                              'bg-red-100 text-red-700': tx.status === 'failed',
+                                                              'bg-gray-100 text-gray-700': !['completed', 'pending', 'failed'].includes(tx.status)
+                                                            }">
                                                                 {{ tx.status }}
                                                             </span>
                                                         </td>
@@ -413,7 +413,7 @@ const isLoading = computed(() => orderStore.isLoading || finishedProductStore.is
 
 const config = useRuntimeConfig();
 
-const order = computed(() => orderStore.selectedOrder);
+const order = computed(() => orderStore.order);
 const product = computed(() => finishedProductStore.selectedProduct);
 
 
@@ -474,26 +474,26 @@ const handleDeliverOrder = (order: any) => {
 
 //computed properties for view edit button
 const isEditButtonVisible = computed(() => {
-  return orderStore.selectedOrder?.status === 'Pending';
+  return orderStore.order?.status === 'Pending';
 });
 
 const isProcessButtonVisible = computed(() => {
-  return orderStore.selectedOrder?.status === 'Pending';
+  return orderStore.order?.status === 'Pending';
 });
 
 //is start production button visible
 const isStartProductionButtonVisible = computed(() => {
-  return orderStore.selectedOrder?.status === 'Processing';
+  return orderStore.order?.status === 'Processing';
 });
 
 const isDeliverProduct = computed(() => {
-  return orderStore.selectedOrder?.status !== 'Delivered' && orderStore.selectedOrder?.is_order_ready;
+  return orderStore.order?.status !== 'Delivered' && orderStore.order?.is_order_ready;
 });
 
 
   </script>
-<style lang="css" scoped>
+<style lang="css" >
 .p-tablist-active-bar {
-    z-index: 0;
+    z-index: 0 !important;
 }
 </style>

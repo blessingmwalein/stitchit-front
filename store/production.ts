@@ -185,12 +185,10 @@ export const useProductionStore = defineStore("production", {
 
         async submitMaterials(id: string) {
             this.isLoading = true;
-            this.successMessage = null;
-            this.errorMessage = null;
 
             try {
-                const addPromise = this.materialsForm.length > 0
-                    ? $fetch<UpdateWorkInProgressResponse>(getApiUrl(`work-in-progress/${id}/materials/bulk`), {
+                const response =
+                    await $fetch<UpdateWorkInProgressResponse>(getApiUrl(`work-in-progress/${id}/materials/bulk`), {
                         method: "POST",
                         body: {
                             materials: this.materialsForm
@@ -199,24 +197,9 @@ export const useProductionStore = defineStore("production", {
                         },
                         headers: { Authorization: `Bearer ${this.token}` },
                     })
-                    : Promise.resolve(null);
 
-                const updatePromise = this.updateMaterialsForm.length > 0
-                    ? $fetch<UpdateWorkInProgressResponse>(getApiUrl(`work-in-progress/${id}/materials/update-bulk`), {
-                        method: "POST",
-                        body: {
-                            materials: this.updateMaterialsForm
-                                .filter(material => material != null)
-                                .map(({ material_id, quantity, description, id }) => ({ material_id, quantity, description, id }))
-                        },
-                        headers: { Authorization: `Bearer ${this.token}` },
-                    })
-                    : Promise.resolve(null);
-
-                const [addResponse, updateResponse] = await Promise.all([addPromise, updatePromise]);
-
-                if (addResponse?.message || updateResponse?.message) {
-                    this.successMessage = addResponse?.message || updateResponse?.message || "Materials submitted successfully";
+                if (response?.message) {
+                    this.successMessage = response.message;
                 }
 
             } catch (error) {

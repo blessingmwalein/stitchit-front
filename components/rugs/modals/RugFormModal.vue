@@ -35,15 +35,15 @@
             <!-- <StaticElement name="personal_title" content="Deetails" tag="h3" /> -->
             <!-- <StaticElement name="divider" tag="hr" /> -->
             <TextElement name="name" label="Name" :rules="['required', 'max:255']" :columns="{
-                                                      container: 6,
-                                                      label: 12,
-                                                      wrapper: 12,
-                                                    }" />
+                                                          container: 6,
+                                                          label: 12,
+                                                          wrapper: 12,
+                                                        }" />
   
             <SelectElement label="Type" name="type" :search="true" :native="false" input-type="search"
               autocomplete="disabled" placeholder="Type" :items="['small', 'medium', 'large']" :columns="{
-                                                        container: 6,
-                                                      }" :rules="['required']" />
+                                                            container: 6,
+                                                          }" :rules="['required']" />
   
             <!-- <StaticElement name="contact_title" content="Contact details" tag="h3" top="2" /> -->
             <!-- <StaticElement name="divider_1" tag="hr" /> -->
@@ -58,16 +58,17 @@
   
   
             <StaticElement name="span" :columns="{
-                                                      container: 4,
-                                                    }" tag="span" />
+                                                          container: 4,
+                                                        }" tag="span" />
             <ButtonElement name="close" button-class="bg-red-500" :columns="{
-                                                      container: 4,
-                                                    }" @click="closeModal()" button-label="Close" :full="true"
+                                                          container: 4,
+                                                        }" @click="closeModal()" button-label="Close" :full="true"
               size="lg" />
   
             <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register" :columns="{
-                                                      container: 4,
-                                                    }" :submits="true" button-label="Submit" :full="true" size="lg" />
+                                                          container: 4,
+                                                        }" :submits="true" button-label="Submit" :full="true"
+              size="lg" />
           </Vueform>
         </client-only>
       </div>
@@ -112,6 +113,8 @@ const rugForm = computed({
 
 // Close modal function
 const closeModal = () => {
+  rugStore.resetForm();// Emit success event
+  rugStore.setSelectedRugProfile(null);// Emit success event
   emit('update:isRugFormModal', false);
 };
 
@@ -120,9 +123,6 @@ const success = () => {
 }
 
 const handleSubmit = async () => {
-  // Call login and wait for it to finish
-  console.log(rugStore.createRugForm);
-
   try {
     if (rugStore.selectedRug?.id) {
       await rugStore.updateRug();
@@ -137,7 +137,6 @@ const handleSubmit = async () => {
         type: "success",
         text: rugStore.successMessage,
       });
-      rugStore.resetForm();// Emit success event
       closeModal(); // Close the modal
     }
   } catch (error) {

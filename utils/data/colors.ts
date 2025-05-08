@@ -40,6 +40,15 @@ export const shapesData = [
     { value: 'circle', label: 'Circle' },
     { value: 'oval', label: 'Oval' },
     { value: 'custom', label: 'Custom' },
+    { value: 'square', label: 'Square' },
+    { value: 'hexagon', label: 'Hexagon' },
+    { value: 'octagon', label: 'Octagon' },
+    { value: 'triangle', label: 'Triangle' },
+    { value: 'diamond', label: 'Diamond' },
+    { value: 'star', label: 'Star' },
+    { value: 'heart', label: 'Heart' },
+    { value: 'rectangle with rounded corners', label: 'Rectangle with Rounded Corners' },
+    { value: 'parallelogram', label: 'Parallelogram' },
 
 ];
 
@@ -59,6 +68,13 @@ export const materialUnitsData = [
     { value: 'Kg', label: 'Kg' },
     { value: 'Litres', label: 'Litres' },
     { value: 'Meters', label: 'Meters' },
+
+    //square meters
+    { value: 'Square Meters', label: 'Square Meters' },
+    { value: 'Square Feet', label: 'Square Feet' },
+    { value: 'Square Inches', label: 'Square Inches' },
+    { value: 'Square Centimeters', label: 'Square Centimeters' },
+    { value: 'Yards', label: 'Yards' },
 ];
 export const orderStatuses = [
     'Pending', 'Processing', 'In Progress', 'Delivered', 'Cancelled'
