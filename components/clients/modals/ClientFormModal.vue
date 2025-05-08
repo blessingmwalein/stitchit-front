@@ -30,49 +30,50 @@
             <Alert v-if="clientStore.errorMessage" variant="error" title="Something went wrong"
               :message="clientStore.errorMessage ?? ''" :showLink="false" />
           </div>
-          <Vueform @submit="handleSubmit" v-model="clientForm" :show-errors="false" :display-errors="false" :endpoint="false" sync>
+          <Vueform @submit="handleSubmit" v-model="clientForm" :show-errors="false" :display-errors="false"
+            :endpoint="false" sync>
             <StaticElement name="personal_title" content="Personal details" tag="h3" />
             <StaticElement name="divider" tag="hr" />
             <TextElement name="name" label="Full Name" :rules="['required', 'max:255']" :columns="{
-                container: 6,
-                label: 12,
-                wrapper: 12,
-              }" />
+                    container: 6,
+                    label: 12,
+                    wrapper: 12,
+                  }" />
   
             <SelectElement label="Gender" name="gender" :search="true" :native="false" input-type="search"
               autocomplete="disabled" placeholder="Gender" :items="['Male', 'Female', 'Other']" :columns="{
-                  container: 6,
-                }" :rules="['required']" />
+                      container: 6,
+                    }" :rules="['required']" />
   
             <StaticElement name="contact_title" content="Contact details" tag="h3" top="2" />
             <StaticElement name="divider_1" tag="hr" />
             <TextElement name="email" input-type="email" :rules="['required', 'max:255', 'email']" label="Email" :columns="{
-                  container: 6,
-                }" />
+                      container: 6,
+                    }" />
             <PhoneElement name="phone_number" field-name="Phone" label="Phone" :columns="{
-                container: 6,
-              }" :rules="['required', 
-                'max:14'
-  
-              ]" :unmask="true" :allowIncomplete="false" />
+                    container: 6,
+                  }" :rules="['required', 
+                    'max:14'
+      
+                  ]" :unmask="true" :allowIncomplete="false" />
   
             <TextElement name="address" placeholder="Address" :rules="['required', 'max:255']" :columns="{
-                container: 6,
-              }" label="Address" />
+                    container: 6,
+                  }" label="Address" />
             <TextElement name="city" placeholder="City" :rules="['required', 'max:255']" :columns="{
-                container: 6,
-              }" label="City" />
+                    container: 6,
+                  }" label="City" />
   
             <StaticElement name="span" :columns="{
-                container: 4,
-              }" tag="span" />
+                    container: 4,
+                  }" tag="span" />
             <ButtonElement name="close" button-class="bg-red-500" :columns="{
-                container: 4,
-              }" @click="closeModal()" button-label="Close" :full="true" size="lg" />
+                    container: 4,
+                  }" @click="closeModal()" button-label="Close" :full="true" size="lg" />
   
             <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register" :columns="{
-                container: 4,
-              }" :submits="true" button-label="Submit" :full="true" size="lg" />
+                    container: 4,
+                  }" :submits="true" button-label="Submit" :full="true" size="lg" />
           </Vueform>
         </client-only>
       </div>
@@ -119,6 +120,8 @@ const clientForm = computed({
 
 // Close modal function
 const closeModal = () => {
+  clientStore.resetForm();// Emit success event
+  clientStore.setSelectedClientProfile(null);// Emit success event
   emit('update:isClientFromModal', false);
 };
 
@@ -144,7 +147,7 @@ const handleSubmit = async () => {
         type: "success",
         text: clientStore.successMessage,
       });
-      clientStore.resetForm();// Emit success event
+
       closeModal(); // Close the modal
     }
   } catch (error) {

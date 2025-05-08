@@ -38,11 +38,13 @@
         <client-only>
           <Vueform @submit="handleSubmit" v-model="orderForm" :show-errors="false" :display-errors="false"
             :endpoint="false" sync>
-            <SelectElement label="Select Rug" name="rug_id" :native="false" :rules="['required']"
-              :columns="{ container: 6 }" :items="rugsStore.rugs.data.map(rug => ({ value: rug.id, label: rug.name }))" />
             <SelectElement label="Select Client" :search="true" @search-change="searchClients" name="client_id"
               :native="false" :rules="['required']" :columns="{ container: 6 }"
               :items="clientStore.clients?.data?.map(client => ({ value: client.id, label: client.name }))" />
+            <SelectElement label="Select Rug" name="rug_id" :native="false" :rules="['required']"
+              :columns="{ container: 6 }"
+              :items="rugsStore.rugs.data.map(rug => ({ value: rug.id, label: `${rug.name} - $${rug.approx_cost}` }))" />
+  
             <TextElement name="total_price" input-type="number" label="Total Price" :rules="['required']"
               :columns="{ container: 6 }" />
             <TagsElement :search="true" name="color_palet" label="Color Palette" :rules="['required']"
@@ -55,8 +57,8 @@
             <TextElement name="width" input-type="number" label="Width" :rules="['required']"
               :columns="{ container: 4 }" />
   
-            <SelectElement label="Shape" name="shape" :native="false" :rules="['required']" :columns="{ container: 6 }"
-              :items="shapesData" />
+            <SelectElement label="Shape" name="shape" :search="true" :native="false" :rules="['required']"
+              :columns="{ container: 6 }" :items="shapesData" />
             <DateElement name="delivery_date" label="Delivery Date" :rules="['required']" :columns="{ container: 6 }" />
             <TextareaElement name="description" label="Description" :rules="['required', 'max:255']"
               :columns="{ container: 12 }" />
@@ -64,8 +66,8 @@
             <StaticElement name="span" :columns="{ container: 4 }" tag="span" />
             <ButtonElement name="close" button-class="bg-red-500" :columns="{ container: 4 }" @click="closeModal()"
               button-label="Close" :full="true" size="lg" />
-            <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register" :columns="{ container: 4 }" :submits="true"
-              button-label="Submit" :full="true" size="lg" />
+            <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register" :columns="{ container: 4 }"
+              :submits="true" button-label="Submit" :full="true" size="lg" />
           </Vueform>
         </client-only>
       </div>
@@ -113,8 +115,6 @@ const orderForm = computed({
 
 const closeModal = () => {
 
-  //clear form data
-  orderStore.setSelectedOrder(null);
   orderStore.resetForm();
   emit('update:isOrderFormModal', false);
 };
@@ -123,7 +123,6 @@ onMounted(async () => {
   await rugsStore.getRugs(); // Fetch only if user is not loaded
   if (props.order !== null) {
 
-    console.log(props.order);
     searchClients(props.order.client_name)
   }
 });
@@ -158,6 +157,8 @@ const handleSubmit = async () => {
       });
       orderStore.resetForm();
       closeModal();
+      //redirect to view order page
+
     }
 
   } catch (error) {
@@ -196,17 +197,12 @@ const searchClients = async (data: any) => {
 
   //set form name, email, phone to search
   clientStore.clientSearchForm.name = data;
-
-
   try {
     await clientStore.searchClients();
 
   } catch (error) {
 
   }
-
-
-
 }
 
 

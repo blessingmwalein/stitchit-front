@@ -9,10 +9,6 @@
       <div v-if="workInProgress.id"
         class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
   
-        <!-- status and action buttons on the right -->
-  
-  
-        <!--         <ProductionStatusBadge :status="workInProgress?.status" /> -->
         <div class="flex items-center justify-between mb-4">
           <!-- Optional Status Badge -->
           <ProductionStatusBadge :status="workInProgress?.status" />
@@ -162,13 +158,13 @@
                 :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials" stripedRows
                 tableStyle="min-width: 50rem" @row-edit-save="onRowEditSave"
                 :pt="{
-                                                                                                                                                                                                                        table: { style: 'min-width: 50rem' },
-                                                                                                                                                                                                                        column: {
-                                                                                                                                                                                                                            bodycell: ({ state }) => ({
-                                                                                                                                                                                                                                style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
-                                                                                                                                                                                                                            })
-                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                    }">
+                                                                                                                                                                                                                                table: { style: 'min-width: 50rem' },
+                                                                                                                                                                                                                                column: {
+                                                                                                                                                                                                                                    bodycell: ({ state }) => ({
+                                                                                                                                                                                                                                        style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
+                                                                                                                                                                                                                                    })
+                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                            }">
                 <template #header>
                   <div class="flex justify-between items-center" v-if="!isProductionDone">
                     <!-- Button aligned to the left -->
@@ -227,7 +223,7 @@
                 <Column field="price_per_unit" header="Unit Cost">
                   <template #body="slotProps">
                     <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data?.material?.price_per_unit) }}
-                      {{slotProps.data?.material?.unit}}</div>
+                      per {{slotProps.data?.material?.unit}}</div>
                   </template>
   
                 </Column>
@@ -713,11 +709,10 @@ const oenEditProduct = (product: FinishedProduct) => {
 
   isFinishedProductFormModal.value = true;
 }
-
 </script>
 
-<style lang="css" scoped>
+<style lang="css">
 .p-tablist-active-bar {
-    z-index: 0;
+  z-index: 0;
 }
 </style>

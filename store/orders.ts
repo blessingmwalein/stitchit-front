@@ -12,6 +12,7 @@ export const useOrderStore = defineStore("order", {
         user: null as User | null,  // Add user to the state
         createOrderForm: {} as CreateOrderRequest,  // Add createOrderForm to the state
         selectedOrder: null as Order | null,  // Add selectedOrder to the 
+        order: {} as Order,  // Add order to the state
         orderImage: null as File | null,  // Add orderImage to the state
         clientOrderFile: {} as File,  // Add clientOrderFiles to the 
         startProductionForm: {} as StartProductionRequest,  // Add startProductionForm to the state
@@ -23,10 +24,8 @@ export const useOrderStore = defineStore("order", {
         async createOrder() {
             this.isLoading = true;
             if (!this.token) return;
-
             try {
                 const formData = new FormData();
-
                 // Append all form fields
                 formData.append("rug_id", this.createOrderForm.rug_id);
                 formData.append("client_id", this.createOrderForm.client_id);
@@ -39,7 +38,6 @@ export const useOrderStore = defineStore("order", {
                 formData.append("width", this.createOrderForm.width.toString());
                 formData.append("shape", this.createOrderForm.shape);
 
-
                 if (this.orderImage) {
                     formData.append("image", this.orderImage as File);
                 }
@@ -49,14 +47,15 @@ export const useOrderStore = defineStore("order", {
                     body: formData,
                     headers: {
                         Authorization: `Bearer ${this.token}`,
-                        // "Content-Type": "multipart/form-data", // Set content type for form data
                         Accept: "application/json", // Set accept header for JSON response
                     },
                 });
 
                 if (response?.response) {
-                    console.log("Order created successfully:", response.response);
-                    this.orders.data.unshift(response.response); // Update orders list
+                    this.orders.data.unshift({
+                        ...response.response,
+                        status: 'Pending'
+                    });
                     this.successMessage = response.message;
                 }
             } catch (error) {
@@ -185,7 +184,7 @@ export const useOrderStore = defineStore("order", {
                 });
 
                 if (response?.response) {
-                    this.selectedOrder = response.response;  // Assuming the response contains a 'orders' array
+                    this.order = response.response;  // Assuming the response contains a 'orders' array
                     // console.log("Clients data:", this.orders);
                 }
             } catch (err) {
@@ -293,8 +292,6 @@ export const useOrderStore = defineStore("order", {
             this.errorMessage = null;  // Reset error message
             this.orderImage = null;  // Reset order image
             this.selectedOrder = null;  // Reset selected order
-
-            console.log("Form reset successfully");
         },
 
         //reset deliver form 

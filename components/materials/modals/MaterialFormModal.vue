@@ -35,20 +35,20 @@
             <!-- <StaticElement name="personal_title" content="Deetails" tag="h3" /> -->
             <!-- <StaticElement name="divider" tag="hr" /> -->
             <TextElement name="name" label="Name" :rules="['required', 'max:255']" :columns="{
-                                                          container: 6,
-                                                          label: 12,
-                                                          wrapper: 12,
-                                                        }" />
+                                                                container: 6,
+                                                                label: 12,
+                                                                wrapper: 12,
+                                                              }" />
   
   
-            <SelectElement label="Material Type" :search="true" name="material_type_id"
-              :native="false" :rules="['required']" :columns="{ container: 6 }"
+            <SelectElement label="Material Type" :search="true" name="material_type_id" :native="false"
+              :rules="['required']" :columns="{ container: 6 }"
               :items="materialStore.materialTypes?.data?.map(type => ({ value: type.id, label: type.name }))" />
   
             <SelectElement label="Unit" name="unit" :search="true" :native="false" input-type="search"
               autocomplete="disabled" placeholder="Type" :items="materialUnitsData" :columns="{
-                                                            container: 6,
-                                                          }" :rules="['required']" />
+                                                                  container: 6,
+                                                                }" :rules="['required']" />
   
             <!-- <StaticElement name="contact_title" content="Contact details" tag="h3" top="2" /> -->
             <!-- <StaticElement name="divider_1" tag="hr" /> -->
@@ -62,18 +62,16 @@
   
   
             <StaticElement name="span" :columns="{
-                                                          container: 4,
-                                                        }" tag="span" />
+                                                                container: 4,
+                                                              }" tag="span" />
             <ButtonElement name="close" button-class="bg-red-500" :columns="{
-                                                          container: 4,
-                                                        }" @click="closeModal()" button-label="Close" :full="true"
+                                                                container: 4,
+                                                              }" @click="closeModal()" button-label="Close" :full="true"
               size="lg" />
   
-            <ButtonElement 
-             :loading="isLoading"
-            button-class="bg-brand-500" name="register" :columns="{
-                                                          container: 4,
-                                                        }" :submits="true" button-label="Submit" :full="true"
+            <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register" :columns="{
+                                                                container: 4,
+                                                              }" :submits="true" button-label="Submit" :full="true"
               size="lg" />
           </Vueform>
         </client-only>
@@ -97,7 +95,7 @@ import { materialUnitsData } from '~/utils/data/colors';
 const emit = defineEmits(['update:isMaterialFormModal', 'success']);
 const materialStore = useMaterialStore();
 const errors: Record<string, string> = materialStore.errors;
-  const isLoading = computed(() => materialStore.isLoading)
+const isLoading = computed(() => materialStore.isLoading)
 
 
 const snackbar = useSnackbar();
@@ -120,6 +118,8 @@ const materialForm = computed({
 
 // Close modal function
 const closeModal = () => {
+  materialStore.resetForm();
+  materialStore.setSelectedMaterial(null);
   emit('update:isMaterialFormModal', false);
 };
 
@@ -149,7 +149,6 @@ const handleSubmit = async () => {
         type: "success",
         text: materialStore.successMessage,
       });
-      materialStore.resetForm();// Emit success event
       closeModal(); // Close the modal
     }
   } catch (error) {
