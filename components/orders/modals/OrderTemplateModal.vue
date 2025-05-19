@@ -14,8 +14,9 @@
                     </p>
                 </div>
                 <div class="flex gap-3 mr-3 w-1/6">
-    
-                    <CustomButton @click="exportToPDF" label="Process" variant="success" rounded="full" :prefixIcon="true">
+
+                    <CustomButton @click="exportToPDF" label="Process" variant="success" rounded="full"
+                        :prefixIcon="true">
                         <template #prefix>
                             <div class="mr-3">
                                 <ArrrowUTurnIcon :height="20" :width="20" />
@@ -32,9 +33,9 @@
                 </button>
             </div>
         </template>
-    
+
         <template #body>
-            
+
             <div ref="pdfContent"
                 class="max-w-4xl mx-auto bg-white font-sans text-sm border border-gray-300 shadow-md overflow-hidden">
                 <!-- Header -->
@@ -57,7 +58,7 @@
                         </div>
                     </div>
                 </div>
-    
+
                 <!-- Client Info -->
                 <div class="px-4 py-2 border border-gray-200 rounded-2xl m-2 border-t border-gray-300">
                     <h2 class="font-semibold text-lg mb-1">Client Information</h2>
@@ -70,7 +71,7 @@
                         <InfoField label="Address" :value="order.address" />
                     </div>
                 </div>
-    
+
                 <!-- Order Table -->
                 <div class="p-4 border border-gray-200 rounded-2xl m-2">
                     <h2 class="font-semibold text-lg mb-2">Order Details</h2>
@@ -86,8 +87,9 @@
                         <tbody class="border-t border-gray-300">
                             <tr class="border-b border-gray-200">
                                 <td class="p-2">
-                                    {{ order.description }} ({{ order.shape }}, {{ order.length }} x {{ order.width }} {{
-                                    order.unit }})
+                                    {{ order.description }} ({{ order.shape }}, {{ order.length }} x {{ order.width }}
+                                    {{
+                                        order.unit }})
                                     <br />
                                     <small class="text-gray-500">Material: {{ order.rug.materials }}</small>
                                 </td>
@@ -101,14 +103,16 @@
                         <div class="mb-2 font-bold bg-yellow-500 inline-block px-2 py-1 rounded">DESIGN</div>
                         <div class="bg-white  p-4 flex justify-center items-center rounded-md ">
                             <div v-if="order?.image_url" class="mb-6 flex justify-center">
-                                <div class=" dark:border-gray-800 max-w-full" style="max-height: 250px; max-width: 100%;">
+                                <div class=" dark:border-gray-800 max-w-full"
+                                    style="max-height: 250px; max-width: 100%;">
                                     <img id="orderImage" :src="`${config.public.imageUrl}${order.image_url}`"
-                                        alt="Order Image" class="w-full h-auto object-cover max-h-[250px] rounded-2xl" />
+                                        alt="Order Image"
+                                        class="w-full h-auto object-cover max-h-[250px] rounded-2xl" />
                                 </div>
                             </div>
-    
+
                         </div>
-    
+
                         <!-- Colors -->
                         <div class=" mb-4">
                             <p class="font-semibold mb-3">Color Palette:</p>
@@ -116,10 +120,10 @@
                         </div>
                     </div>
                 </div>
-    
+
                 <!-- Design + Colors -->
-    
-    
+
+
                 <!-- Payment + Terms -->
                 <div class="py-6 space-y-4 border border-gray-200 rounded-2xl m-2">
                     <div class="px-4 py-6 border-b border-gray-200">
@@ -130,7 +134,7 @@
                             <InfoField label="Payment Method" value="Cash, InnBucks, Ecocash" />
                         </div>
                     </div>
-    
+
                     <div class="px-4">
                         <h3 class="font-semibold text-lg mb-2">Terms</h3>
                         <ul class="list-disc list-inside text-sm">
@@ -140,7 +144,7 @@
                         </ul>
                     </div>
                 </div>
-    
+
                 <!-- Bank Info -->
                 <div class="sm:col-span-3 py-6 space-y-4 px-4">
                     <label class="font-semibold block mb-2">Payment Methods</label>
@@ -153,30 +157,29 @@
                                 <p class="text-sm text-gray-600">Pay in person</p>
                             </div>
                         </div>
-    
+
                         <!-- Ecocash -->
                         <div class="w-60 border border-gray-300 rounded-2xl shadow-md p-4 flex items-center gap-4">
                             <img src="/images/payments/ecocash.png" alt="Ecocash" class="h-12 w-12 object-contain" />
                             <div>
                                 <h4 class="font-semibold text-gray-800">Ecocash</h4>
                                 <p class="text-sm text-gray-600">Blessing Mwale</p>
-                                <p class="text-sm text-gray-600">07724400088</p>
+                                <p class="text-sm text-gray-600">0772440088</p>
                             </div>
                         </div>
-    
+
                         <!-- InnBucks -->
                         <div class="w-60 border border-gray-300 rounded-2xl shadow-md p-4 flex items-center gap-4">
                             <img src="/images/payments/inbukks.png" alt="InnBucks" class="h-12 w-12 object-contain" />
                             <div>
                                 <h4 class="font-semibold text-gray-800">InnBucks</h4>
                                 <p class="text-sm text-gray-600">Blessing Mwale</p>
-                                <p class="text-sm text-gray-600">07724400088</p>
+                                <p class="text-sm text-gray-600">0772440088</p>
                             </div>
                         </div>
                     </div>
-    
                 </div>
-    
+
                 <!-- Signature -->
                 <div class="p-4 flex justify-end">
                     <div class="text-right">
@@ -186,7 +189,7 @@
                 </div>
             </div>
         </template>
-    
+
         <ConfirmModal :visible="showConfirmModal" @update:visible="showConfirmModal = $event"
             @confirmed="handleConfirmation">
             <template #header> Process Order </template>
@@ -197,10 +200,10 @@
                 </div>
             </template>
         </ConfirmModal>
-    
+
     </Modal>
 </template>
-  
+
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
 import { useRuntimeConfig } from "#app";
@@ -231,18 +234,18 @@ const showConfirmModal = ref(false)
 const snackbar = useSnackbar();
 
 const props = defineProps({
-  isViewProcessOrderModal: {
-    type: Boolean,
-    required: true,
-  },
-  order: {
-    type: Object as () => Order | null,
-    required: true,
-  },
+    isViewProcessOrderModal: {
+        type: Boolean,
+        required: true,
+    },
+    order: {
+        type: Object as () => Order | null,
+        required: true,
+    },
 });
 
 const closeModal = () => {
-  emit('update:isViewProcessOrderModal', false);
+    emit('update:isViewProcessOrderModal', false);
 };
 
 
@@ -291,62 +294,61 @@ const exportToPDF = async () => {
 
 
 
-  //   // Update the state with the generated PDF file (assuming you're using React state)
-  //   orderStore.setClientOrderFile(pdfFile);  // assuming setFile is your state setter function
+    //   // Update the state with the generated PDF file (assuming you're using React state)
+    //   orderStore.setClientOrderFile(pdfFile);  // assuming setFile is your state setter function
 
-  // Now, upload the file to the API
-  try {
-    await orderStore.processOrder();
+    // Now, upload the file to the API
+    try {
+        await orderStore.processOrder();
 
-    if (orderStore.successMessage) {
-      snackbar.add({ type: "success", text: orderStore.successMessage });
+        if (orderStore.successMessage) {
+            snackbar.add({ type: "success", text: orderStore.successMessage });
+        }
+
+        if (orderStore.errorMessage) {
+
+            snackbar.add({ type: "error", text: orderStore.errorMessage });
+            //   return;
+        }
+
+        closeModal();
+
+    } catch (error) {
+        console.error("Error uploading PDF:", error);
+        snackbar.add({ type: "error", text: "Failed to upload PDF." });
     }
-
-    if (orderStore.errorMessage) {
-
-      snackbar.add({ type: "error", text: orderStore.errorMessage });
-      //   return;
-    }
-
-    closeModal();
-
-  } catch (error) {
-    console.error("Error uploading PDF:", error);
-    snackbar.add({ type: "error", text: "Failed to upload PDF." });
-  }
 
 };
 
 const handleConfirmation = async (confirmed: boolean) => {
-  if (confirmed) {
-    showConfirmModal.value = false;
-    await orderStore.processOrder();
-    closeModal();
-  } else {
-    showConfirmModal.value = false;
-  }
+    if (confirmed) {
+        showConfirmModal.value = false;
+        await orderStore.processOrder();
+        closeModal();
+    } else {
+        showConfirmModal.value = false;
+    }
 };
 
 
 const convertImageToBase64 = async (imageUrl: string): Promise<string> => {
-  const response = await fetch(imageUrl, { mode: "cors" });
-  const blob = await response.blob();
+    const response = await fetch(imageUrl, { mode: "cors" });
+    const blob = await response.blob();
 
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      resolve(reader.result as string);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            resolve(reader.result as string);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
 };
 
 
 
-  </script>
-  
-  <style scoped>
+</script>
+
+<style scoped>
 /* Add any extra styling here if needed */
 </style>
-  

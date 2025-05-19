@@ -5,20 +5,20 @@
     </template>
     <template v-else>
       <PageBreadcrumb :pageTitle="workInProgress?.production_number" />
-  
+
       <div v-if="workInProgress.id"
         class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-  
+
         <div class="flex items-center justify-between mb-4">
           <!-- Optional Status Badge -->
           <ProductionStatusBadge :status="workInProgress?.status" />
-  
+
           <!-- Action Buttons -->
           <div class="flex gap-2 ">
             <div v-for="nextStatus in getNextStatusOptions(workInProgress?.status)" :key="nextStatus">
               <CustomButton class="w-full" :label="`Change to ${nextStatus}`"
                 @click="setNextStatus(nextStatus); changeStatus()" variant="brand" rounded="full">
-  
+
                 <template #prefix>
                   <ArrrowUTurnIcon />
                 </template>
@@ -72,10 +72,10 @@
               </span>
             </Tab>
           </TabList>
-  
+
           <!-- Tab Panels -->
           <TabPanels>
-  
+
             <!-- Production Details -->
             <TabPanel value="0">
               <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -89,7 +89,7 @@
                 </div>
               </div>
             </TabPanel>
-  
+
             <!-- Order Details -->
             <TabPanel value="1">
               <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -115,7 +115,7 @@
                 </div>
               </div>
             </TabPanel>
-  
+
             <!-- Client Details -->
             <TabPanel value="2">
               <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 relative">
@@ -128,7 +128,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                   </svg>
                 </button>
-  
+
                 <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Client Information</h4>
                 <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-12">
                   <InfoField label="Client Name" :value="workInProgress.order?.client_name" />
@@ -137,7 +137,7 @@
                 </div>
               </div>
             </TabPanel>
-  
+
             <!-- Rug Details -->
             <TabPanel value="3">
               <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -152,93 +152,92 @@
                 </div>
               </div>
             </TabPanel>
-  
+
             <TabPanel value="4">
               <DataTable v-model:editingRows="editingRows" :loading="isLoading" editMode="row" dataKey="id" paginator
                 :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials" stripedRows
-                tableStyle="min-width: 50rem" @row-edit-save="onRowEditSave"
-                :pt="{
-                                                                                                                                                                                                                                table: { style: 'min-width: 50rem' },
-                                                                                                                                                                                                                                column: {
-                                                                                                                                                                                                                                    bodycell: ({ state }) => ({
-                                                                                                                                                                                                                                        style:  state['d_editing']&&'padding-top: 0.75rem; padding-bottom: 0.75rem'
-                                                                                                                                                                                                                                    })
-                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                            }">
+                tableStyle="min-width: 50rem" @row-edit-save="onRowEditSave" :pt="{
+                  table: { style: 'min-width: 50rem' },
+                  column: {
+                    bodycell: ({ state }) => ({
+                      style: state['d_editing'] && 'padding-top: 0.75rem; padding-bottom: 0.75rem'
+                    })
+                  }
+                }">
                 <template #header>
                   <div class="flex justify-between items-center" v-if="!isProductionDone">
                     <!-- Button aligned to the left -->
-                    <Button @click="addNewMaterial" variant="primary" class="p-button-rounded p-button-sm" label="Add Row"
-                      icon="pi pi-plus">
+                    <Button @click="addNewMaterial" variant="primary" class="p-button-rounded p-button-sm"
+                      label="Add Row" icon="pi pi-plus">
                       Add Row
                     </Button>
                     <Button @click="save" variant="outline" class="p-button-rounded p-button-sm" label="Add Row"
                       icon="pi pi-plus">
                       Save
                     </Button>
-  
+
                     <!-- Search input aligned to the right -->
                   </div>
                 </template>
-  
+
                 <Column field="material_id" header="Name">
-  
+
                   <template #body="slotProps">
-  
+
                     <div class="font-semibold text-sm">{{ slotProps.data.material?.name }}</div>
-  
+
                     <div class="text-xs text-gray-400">
                       {{ slotProps.data.material.material_type_name }}
-  
+
                     </div>
-  
+
                   </template>
-  
+
                   <template #editor="{ data, field }">
                     <!-- <InputText v-model="data[field]" fluid /> -->
                     <Select v-model="data[field]"
-                      :options="materialsOption.data.map(material=> ({ value:material.id, label:material.name}))"
+                      :options="materialsOption.data.map(material => ({ value: material.id, label: material.name }))"
                       optionLabel="label" optionValue="value" placeholder="Select a material" fluid>
-  
+
                     </Select>
-  
+
                   </template>
                 </Column>
-  
+
                 <Column field="description" header="Description">
                   <template #body="slotProps">
                     <div class="text-xs text-gray-400">
                       <!-- {{ slotProps.data.description }} -->
                       <Badge variant="light" :color="light">
-                        {{ slotProps.data.description}}
+                        {{ slotProps.data.description }}
                       </Badge>
                     </div>
                   </template>
                   <template #editor="{ data, field }">
                     <InputText v-model="data[field]" fluid />
                   </template>
-  
+
                 </Column>
-  
+
                 <Column field="price_per_unit" header="Unit Cost">
                   <template #body="slotProps">
                     <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data?.material?.price_per_unit) }}
-                      per {{slotProps.data?.material?.unit}}</div>
+                      per {{ slotProps.data?.material?.unit }}</div>
                   </template>
-  
+
                 </Column>
-  
+
                 <Column field="quantity" header="Quantity">
                   <template #body="slotProps">
                     <div class="font-semibold text-sm">{{ slotProps.data?.quantity }}</div>
                   </template>
-  
+
                   <template #editor="{ data, field }">
                     <InputNumber v-model="data[field]" fluid />
                   </template>
-  
+
                 </Column>
-  
+
                 <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
                 <template #empty>
                   <div class="flex flex-col items-center justify-center py-10 text-gray-500">
@@ -247,12 +246,12 @@
                       <path stroke-linecap="round" stroke-linejoin="round"
                         d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                     </svg>
-  
+
                     <p class="mt-4 text-lg font-semibold">No materials found</p>
                     <p class="text-sm text-gray-400">Try allocating materials.</p>
                   </div>
                 </template>
-  
+
               </DataTable>
             </TabPanel>
             <TabPanel value="5">
@@ -263,8 +262,6 @@
                   <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No Product"
                     class="w-40 h-40 opacity-60" />
                   <p class="text-xl font-semibold">No product uploaded</p>
-  
-  
                   <div>
                     <CustomButton prefixIcon variant="primary" rounded="full" label="Add Product"
                       @click="setProductForm(workInProgress)">
@@ -273,70 +270,71 @@
                       </template>
                     </CustomButton>
                   </div>
-  
                 </div>
               </div>
-  
+
               <div v-else class="flex flex-col md:flex-row justify-between items-stretch gap-4 mx-4 py-12">
-                <!-- PRODUCT DETAILS CARD -->
-                <div class="flex bg-white rounded-lg shadow dark:bg-gray-800 flex-col md:flex-row flex-1 overflow-hidden">
-                  <!-- Image Wrapper -->
-                  <div class="flex-shrink-0 w-full md:w-1/2 p-2 flex justify-center items-center">
-                    <img v-if="product.default_image" :src="`${config.public.imageUrl}${product.default_image}`"
-                      alt="Product image" class="w-full h-full object-cover rounded-2xl shadow-md" />
-                  </div>
-                  <!-- Product Info -->
-                  <div class="flex-auto p-6 flex flex-col">
+                <!-- LEFT: IMAGE SLIDER -->
+                <div class="md:w-1/2 w-full flex items-center justify-center">
+                  <ProductImageSlider :images="product.images" class="w-full h-full " />
+                </div>
+
+                <!-- RIGHT: INFO + ACTION -->
+                <div class="md:w-1/2 w-full flex flex-col gap-4">
+                  <!-- PRODUCT DETAILS -->
+                  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex flex-col">
                     <h1 class="text-2xl font-bold dark:text-white mb-2">{{ product.name }}</h1>
                     <p class="text-gray-600 dark:text-gray-300 mb-4">{{ product.description }}</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 dark:text-gray-200 flex-grow">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 dark:text-gray-200">
                       <InfoField label="Production Cost"
                         :value="formatCurrency(product.actual_production_cost) ?? 'N/A'" />
                       <InfoField label="Total Price" :value="formatCurrency(product.total_price) ?? 'N/A'" />
                       <InfoField label="Size"
                         :value="`${product.length} x ${product.width} ${product.unit} (${product.shape})`" />
                     </div>
+
                     <div class="mt-6">
                       <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Rug Colors</h4>
                       <ColorPalertView :colors="product?.order?.color_palet" />
                     </div>
                   </div>
-                </div>
-  
-                <!-- DATES & ACTIONS CARD -->
-                <div class="w-full md:w-1/3 bg-white rounded-lg shadow dark:bg-gray-800 flex flex-col p-6">
-                  <!-- Dates Grid -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 dark:text-gray-200 flex-1">
-                    <InfoField label="Start Date" :value="formatDateString(product.start_date) ?? 'N/A'" />
-                    <InfoField label="End Date" :value="formatDateString(product.end_date) ?? 'N/A'" />
-                    <InfoField label="Created At" :value="formatDateString(product.created_at) ?? 'N/A'" />
-                    <InfoField label="Updated At" :value="formatDateString(product.updated_at) ?? 'N/A'" />
-                    <InfoField label="Available Units" :value="`${product.available_quantity} units`" />
-                  </div>
-                  <!-- Edit/Delete Buttons -->
-                  <div class="mt-4 flex flex-row gap-2">
-                    <CustomButton prefixIcon variant="primary" class="w-full p-button-rounded p-button-sm" label="Edit"
-                      @click="oenEditProduct(product)">
-                      <template #prefix>
-                        <PencilIcon :width="20" :height="20" />
-                      </template>
-                    </CustomButton>
-                    <CustomButton prefixIcon variant="danger" class="w-full p-button-rounded p-button-sm" label="Delete"
-                      @click="">
-                      <template #prefix>
-                        <TrashIcon :width="20" :height="20" />
-                      </template>
-                    </CustomButton>
+
+                  <!-- DATES & ACTIONS -->
+                  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex flex-col">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 dark:text-gray-200">
+                      <InfoField label="Start Date" :value="formatDateString(product.start_date) ?? 'N/A'" />
+                      <InfoField label="End Date" :value="formatDateString(product.end_date) ?? 'N/A'" />
+                      <InfoField label="Created At" :value="formatDateString(product.created_at) ?? 'N/A'" />
+                      <InfoField label="Updated At" :value="formatDateString(product.updated_at) ?? 'N/A'" />
+                      <InfoField label="Available Units" :value="`${product.available_quantity} units`" />
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="mt-4 flex flex-row gap-2">
+                      <CustomButton prefixIcon variant="primary" class="w-full p-button-rounded p-button-sm"
+                        label="Edit" @click="oenEditProduct(product)">
+                        <template #prefix>
+                          <PencilIcon :width="20" :height="20" />
+                        </template>
+                      </CustomButton>
+                      <CustomButton prefixIcon variant="danger" class="w-full p-button-rounded p-button-sm"
+                        label="Delete" @click="">
+                        <template #prefix>
+                          <TrashIcon :width="20" :height="20" />
+                        </template>
+                      </CustomButton>
+                    </div>
                   </div>
                 </div>
               </div>
-  
             </TabPanel>
-  
+
+
             <TabPanel value="6">
               <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
                 <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Summary</h4>
-  
+
                 <!-- Overall Material Cost -->
                 <div class="mb-6">
                   <div class="flex justify-between items-center mb-4">
@@ -345,7 +343,7 @@
                       ${{ overallMaterialCost.toFixed(2) }}
                     </div>
                   </div>
-  
+
                   <!-- Accordion for Material Groups -->
                   <Accordion :value="activeGroupIndex">
                     <AccordionPanel v-for="(group, index) in groupedMaterials" :key="group.type" :value="index">
@@ -375,7 +373,7 @@
                               <td class="py-1 pr-3">{{ formatCurrency(item.cost) }}</td>
                             </tr>
                             <tr class="font-semibold">
-  
+
                               <td colspan="5" class="text-right py-2 pr-3">Total</td>
                               <td class="py-2 pr-3">{{ formatCurrency(group.totalCost) }}</td>
                             </tr>
@@ -385,7 +383,7 @@
                     </AccordionPanel>
                   </Accordion>
                 </div>
-  
+
                 <!-- Additional Production Summary -->
                 <div class="border-t pt-4 mt-6">
                   <h5 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Production Summary</h5>
@@ -410,22 +408,23 @@
         </Tabs>
       </div>
     </template>
-  
-  
+
+
     <ConfirmModal :visible="showConfirmUpdateStatus" @update:visible="showConfirmUpdateStatus = $event"
       @confirmed="handleConfirmation">
       <template #header> Update Status </template>
-      <template #body> Are you sure you want to update this production to {{updateWorkInProgressForm.status}}? </template>
+      <template #body> Are you sure you want to update this production to {{ updateWorkInProgressForm.status }}?
+      </template>
     </ConfirmModal>
-  
+
     <DoneProductionModal :isDoneProductionModal="isDoneProductionModal" :workInProgress="workInProgress"
       @update:isDoneProductionModal="(value) => isDoneProductionModal = value" />
-  
-  
+
+
     <AddFinishedProductModal :isFinishedProductFormModal="isFinishedProductFormModal" :product="product"
       :workInProgress="workInProgress"
       @update:isFinishedProductFormModal="(value) => isFinishedProductFormModal = value" />
-  
+
   </admin-layout>
 </template>
 
@@ -466,6 +465,7 @@ import PencilIcon from '~/icons/PencilIcon.vue'
 import { PlugInIcon, TrashIcon } from '~/icons'
 import type { FinishedProduct } from '~/utils/models/finished_products'
 import DetailSkeletonLoader from '~/components/ui/DetailSkeletonLoader.vue'
+import ProductImageSlider from '~/components/production/ProductImageSlider.vue'
 
 
 const { formatCurrency } = useCurrency();

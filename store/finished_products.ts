@@ -1,25 +1,38 @@
 import type { AuthResponse, LoginCredentials, User } from "~/utils/models/auth";
-import type { CreateFinishedProductRequest, CreateFinishedProductResponse, FinishedProduct, FinishedProductResponse, FinishedProductsResponse, FinishedProductsResponseData,DashboardData, SalesData, DasbhoardDataResponse, SalesMonthlyDataResponse } from "~/utils/models/finished_products";
+import type { CreateFinishedProductRequest, CreateFinishedProductResponse, FinishedProduct, FinishedProductResponse, FinishedProductsResponse, FinishedProductsResponseData, DashboardData, SalesData, DasbhoardDataResponse, SalesMonthlyDataResponse } from "~/utils/models/finished_products";
 import type { WorkInProgress } from "~/utils/models/production";
+
 
 export const useFinishedProductsStore = defineStore("finishedProducts", {
     state: () => ({
-        products: {} as FinishedProductsResponseData,
+        products: { data: [], links: { first: '', last: '', next: null, prev: null }, meta: { current_page: 1, from: 1, last_page: 1, links: [], path: '', per_page: 15, to: 1, total: 0 } },
         token: useCookie<string | null>("auth_token").value || null,
         successMessage: null as string | null,
         errorMessage: null as string | null,
         errors: {} as Record<string, string>,
         isLoading: false,
-        productImage: null as File | null,  // Add orderImage to the state
-        user: null as User | null,  // Add user to the state
-        createFinishedProductForm: {} as CreateFinishedProductRequest,  // Add createFinishedProductForm to the state
-        selectedProduct: null as FinishedProduct | null,  // Add selectedProduct to the state
-        dashoardData: {} as  DashboardData,
-        salesData:{} as SalesData[]
+        productImage: null as File | null,  // Default image (first selected)
+        additionalImages: [] as File[],     // Additional images
+        user: null as User | null,
+        createFinishedProductForm: {} as CreateFinishedProductRequest,
+        selectedProduct: null as FinishedProduct | null,
+        dashoardData: {} as DashboardData,
+        salesData: {} as SalesData[]
     }),
 
     actions: {
-        // Login action using $fetch
+        // Set additional images for product creation
+        setAdditionalImages(images: File[]) {
+            this.additionalImages = images;
+        },
+
+        // Clear all images
+        clearImages() {
+            this.productImage = null;
+            this.additionalImages = [];
+        },
+
+        // Create finished product with multiple images
         async createFinishedProduct() {
             console.log(this.createFinishedProductForm);
 
@@ -41,39 +54,44 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 formData.append('length', this.createFinishedProductForm.length?.toString() || '');
                 formData.append('width', this.createFinishedProductForm.width?.toString() || '');
 
-
+                // Add default image
                 if (this.productImage) {
                     formData.append("default_image", this.productImage);
+                }
+
+                // Add additional images
+                if (this.additionalImages && this.additionalImages.length > 0) {
+                    this.additionalImages.forEach(image => {
+                        formData.append("images[]", image);
+                    });
                 }
 
                 const response = await $fetch<CreateFinishedProductResponse>(getApiUrl("finished-products"), {
                     method: "POST",
                     body: formData,
-                    headers: { Authorization: `Bearer ${this.token}`, Accept: "application/json", },
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                        Accept: "application/json",
+                    },
                 });
 
                 console.log(response);
 
                 if (response?.response) {
-                    this.selectedProduct = response.response  // Assuming the response contains the created material data
+                    this.selectedProduct = response.response;
                     this.successMessage = response.message;
                 }
             } catch (error) {
-                // Handle API error
-                console.log(error)
+                console.log(error);
                 const errorMsg = handleApiError(error);
-                console.log("Error creating material:", errorMsg);
-                this.errorMessage = errorMsg.errorMessage || "An error occurred while creating the material";
+                console.log("Error creating product:", errorMsg);
+                this.errorMessage = errorMsg.errorMessage || "An error occurred while creating the product";
             } finally {
                 this.isLoading = false;
-                // this.createFinishedProductForm = {} as CreateFinishedProductRequest;  // Reset the form state
-                // this.errors = {};  // Reset errors
-                // this.successMessage = null;  // Reset success message
-                // this.errorMessage = null;  // Reset error message
             }
         },
 
-        //update material profile using $fetch
+        // Update finished product with multiple images
         async updateFinishedProduct() {
             this.isLoading = true;
             if (!this.token) return;
@@ -93,8 +111,16 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 formData.append('length', this.createFinishedProductForm.length?.toString() || '');
                 formData.append('width', this.createFinishedProductForm.width?.toString() || '');
 
+                // Add default image if changed
                 if (this.productImage) {
                     formData.append("default_image", this.productImage);
+                }
+
+                // Add additional images
+                if (this.additionalImages && this.additionalImages.length > 0) {
+                    this.additionalImages.forEach(image => {
+                        formData.append("images[]", image);
+                    });
                 }
 
                 const response = await $fetch<CreateFinishedProductResponse>(getApiUrl(`finished-products/${this.selectedProduct?.id}`), {
@@ -106,26 +132,119 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                     },
                 });
 
-                console.log(response)
+                console.log(response);
 
                 if (response?.response) {
-                    const updatedProduct = response.response; // Assuming the updated material data is returned here
-                    const { id } = updatedProduct;
+                    const updatedProduct = response.response;
                     this.successMessage = response.message;
                     this.selectedProduct = updatedProduct;
                 }
             } catch (error) {
-                // Handle API error
                 console.log(error);
                 const errorMsg = handleApiError(error);
                 console.log("Error updating product:", errorMsg);
-                this.errorMessage = errorMsg.errorMessage || "An error occurred while updating the material";
+                this.errorMessage = errorMsg.errorMessage || "An error occurred while updating the product";
             } finally {
                 this.isLoading = false;
             }
         },
 
-        // Fetch products using $fetch
+        // Upload additional images to an existing product
+        async uploadProductImages(productId: number, images: any[]) {
+            this.isLoading = true;
+            if (!this.token || !productId || !images.length) return;
+
+            try {
+                const formData = new FormData();
+
+                // Add all images to the formData
+                images.forEach(image => {
+                    formData.append("images[]", image);
+                });
+
+                const response = await $fetch(getApiUrl(`finished-products/${productId}/images`), {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                        Accept: "application/json",
+                    },
+                });
+
+                if (response?.success) {
+                    this.successMessage = response.message || "Images uploaded successfully";
+                    // Update the selected product if needed
+                    if (this.selectedProduct && this.selectedProduct.id === productId) {
+                        // Fetch the updated product to get the new images
+                        await this.getFinishedProductById(productId);
+                    }
+                }
+
+                return response;
+            } catch (error) {
+                console.log(error);
+                const errorMsg = handleApiError(error);
+                this.errorMessage = errorMsg.errorMessage || "An error occurred while uploading images";
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        // Delete a product image
+        async deleteProductImage(productId: number, imageId: number) {
+            this.isLoading = true;
+            if (!this.token) return;
+
+            try {
+                const response: any = await $fetch(getApiUrl(`finished-products/images/${imageId}`), {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                        Accept: "application/json",
+                    },
+                });
+
+                if (response?.success) {
+                    this.successMessage = response.message || "Image deleted successfully";
+                    // Update the selected product if needed
+                    if (this.selectedProduct && this.selectedProduct.id === productId) {
+                        // Fetch the updated product to get the current images
+                        await this.getFinishedProductById(productId);
+                    }
+                }
+
+                return response;
+            } catch (error) {
+                console.log(error);
+                const errorMsg = handleApiError(error);
+                this.errorMessage = errorMsg.errorMessage || "An error occurred while deleting the image";
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+
+        // Get a specific finished product by ID
+        async getFinishedProductById(id) {
+            this.isLoading = true;
+            if (!this.token) return;
+            try {
+                const response = await $fetch<FinishedProductResponse>(getApiUrl(`finished-products/${id}`), {
+                    headers: { Authorization: `Bearer ${this.token}` },
+                });
+                this.selectedProduct = response.response;
+                return response.response;
+            } catch (err) {
+                console.error("Error fetching product:", err);
+                this.errorMessage = "An error occurred while fetching product data";
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        // Existing methods...
         async getFinishedProducts() {
             this.isLoading = true;
             if (!this.token) return;
@@ -135,7 +254,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 });
 
                 if (response?.response) {
-                    this.products = response.response;  // Assuming the response contains a 'products' array
+                    this.products = response.response;
                 }
             } catch (err) {
                 console.error("Error fetching products:", err);
@@ -152,7 +271,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 const response = await $fetch<FinishedProductResponse>(getApiUrl(`finished-products/work-in-progress/${id}`), {
                     headers: { Authorization: `Bearer ${this.token}` },
                 });
-                this.selectedProduct = response.response;  // Assuming the response contains a 'products' array
+                this.selectedProduct = response.response;
 
             } catch (err) {
                 console.error("Error fetching products:", err);
@@ -161,6 +280,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 this.isLoading = false;
             }
         },
+
         async getFinishedProductByOrderIdId(id: number) {
             this.isLoading = true;
             if (!this.token) return;
@@ -168,7 +288,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 const response = await $fetch<FinishedProductResponse>(getApiUrl(`finished-products/order/${id}`), {
                     headers: { Authorization: `Bearer ${this.token}` },
                 });
-                this.selectedProduct = response.response;  // Assuming the response contains a 'products' array
+                this.selectedProduct = response.response;
 
             } catch (err) {
                 console.error("Error fetching products:", err);
@@ -178,8 +298,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
             }
         },
 
-        //get dashboard data 
-        async getDashoardData(){
+        async getDashoardData() {
             this.isLoading = true;
 
             if (!this.token) return;
@@ -189,18 +308,17 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 });
 
                 if (response?.response) {
-                    this.dashoardData = response.response;  // Assuming the response contains a 'products' array
+                    this.dashoardData = response.response;
                 }
             } catch (err) {
                 console.error("Error fetching products:", err);
-                this.errorMessage =  "An error occurred while fetching dashboard data";
+                this.errorMessage = "An error occurred while fetching dashboard data";
             } finally {
                 this.isLoading = false;
             }
         },
 
-        //get sales dashboard data
-        async getSalesDashboardData(){
+        async getSalesDashboardData() {
             this.isLoading = true;
 
             if (!this.token) return;
@@ -210,17 +328,16 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 });
 
                 if (response?.response) {
-                    this.salesData = response.response;  // Assuming the response contains a 'products' array
+                    this.salesData = response.response;
                 }
             } catch (err) {
                 console.error("Error fetching products:", err);
-                this.errorMessage =  "An error occurred while fetching sales data";
+                this.errorMessage = "An error occurred while fetching sales data";
             } finally {
                 this.isLoading = false;
             }
         },
 
-        //delete material
         async deleteMaterial() {
             this.isLoading = true;
             if (!this.token) return;
@@ -231,12 +348,11 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 });
 
                 if (response?.response) {
-                    this.products.data = this.products.data.filter(product => product.id !== this.selectedProduct?.id);  // Remove the deleted material from the list
+                    this.products.data = this.products.data.filter(product => product.id !== this.selectedProduct?.id);
                     this.successMessage = response.message;
                 }
 
             } catch (error) {
-                // Handle API error
                 const errorMsg = handleApiError(error);
                 console.log("Error deleting product:", errorMsg);
                 this.errorMessage = errorMsg.errorMessage || "An error occurred while deleting the product";
@@ -245,21 +361,17 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
             }
         },
 
-        //get dashboard data
-        
-        //reset form and messages
         resetForm() {
-            this.createFinishedProductForm = {} as CreateFinishedProductRequest;  // Reset the form state
-            this.errors = {};  // Reset errors
-            this.successMessage = null;  // Reset success me\ssage
-            this.errorMessage = null;  // Reset error message
+            this.createFinishedProductForm = {} as CreateFinishedProductRequest;
+            this.errors = {};
+            this.successMessage = null;
+            this.errorMessage = null;
+            this.productImage = null;
+            this.additionalImages = [];
         },
 
-
         setSelectedProduct(product: any) {
-            this.selectedProduct = product;  // Set the selected product profile
-            //set state form with selected product data
-            // this.createFinishedProductForm = product
+            this.selectedProduct = product;
         },
 
         setCreateFormImage(image: File | null) {
@@ -267,9 +379,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
         },
 
         setProductForm(workInProgress: WorkInProgress): void {
-
             if (!workInProgress?.order) return;
-
 
             const {
                 order: {
@@ -279,7 +389,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                     unit,
                     shape,
                     rug_id,
-                    id: order_id // Extract order.id and rename it to order_id
+                    id: order_id
                 },
                 id: work_in_progress_id
             } = workInProgress;
@@ -297,7 +407,7 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 id: null
             };
 
-            console.log(this.createFinishedProductForm)
+            console.log(this.createFinishedProductForm);
         },
 
         setEditProductForm(product: FinishedProduct): void {
@@ -318,7 +428,6 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 description
             } = product;
 
-
             this.createFinishedProductForm = {
                 ...this.createFinishedProductForm,
                 total_price,
@@ -334,7 +443,6 @@ export const useFinishedProductsStore = defineStore("finishedProducts", {
                 description,
                 id,
             };
-
         }
     },
 
