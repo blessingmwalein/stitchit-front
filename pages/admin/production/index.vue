@@ -5,40 +5,41 @@
         </template>
         <template v-else>
             <PageBreadcrumb :pageTitle="currentPageTitle" />
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-    
+            <div
+                class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+
                 <DataTable filterDisplay="menu" :loading="isLoading" dataKey="id" v-model:filters="filters"
                     sortMode="multiple" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]"
                     :value="workInProgressItems.data" stripedRows tableStyle="min-width: 50rem"
                     :globalFilterFields="['id', 'rug.name', 'status', 'size.name']">
-    
+
                     <template #header>
                         <div class="flex justify-between items-center ">
                             <!-- Add New Order Button -->
                             <div>
-    
-    
+
+
                             </div>
                             <!-- Filters -->
                             <div class="flex-1 flex justify-center">
                                 <div
                                     class="flex space-x-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-full border border-gray-300">
                                     <button v-for="status in ['All', ...productionStatuses]" :key="status"
-                                        @click="applyStatusFilter(status)" :class="[ 
-                                      'px-3 py-1 text-sm font-medium rounded-full transition-colors', 
-                                      selectedStatus === status
-                                        ? 'bg-white text-indigo-600 shadow border border-gray-300'
-                                        : 'text-gray-600 hover:text-indigo-600'
-                                    ]">
+                                        @click="applyStatusFilter(status)" :class="[
+                                            'px-3 py-1 text-sm font-medium rounded-full transition-colors',
+                                            selectedStatus === status
+                                                ? 'bg-white text-indigo-600 shadow border border-gray-300'
+                                                : 'text-gray-600 hover:text-indigo-600'
+                                        ]">
                                         {{ status }}
                                     </button>
                                 </div>
                             </div>
-    
+
                             <!-- Search input -->
                             <div class="flex justify-between items-center">
-    
-    
+
+
                                 <!-- Search input -->
                                 <div class="flex justify-end">
                                     <IconField>
@@ -51,26 +52,30 @@
                                 </div>
                             </div>
                         </div>
-    
+
                     </template>
-    
+
                     <!-- Order ID Column with Filter -->
                     <Column field="client_name" header="Client Infor" sortable :filter="true">
                         <template #body="slotProps">
                             <div class="flex items-center">
                                 <!-- Using the InitialAvatar component -->
-                                <InitialAvatar :name="slotProps.data.order.client_name" />
-    
+                                <!-- <InitialAvatar :name="slotProps.data.order.client_name" /> -->
+                                <img v-if="slotProps.data?.order?.image_url"
+                                    :src="`${config.public.imageUrl}${slotProps?.data?.order?.image_url}`"
+                                    alt="WorkInProgress Image" width="60" height="60"
+                                    class=" object-cover rounded-2xl" />
+
                                 <div class="ml-3">
-                                    <div class="font-semibold text-sm">#{{slotProps.data.order.order_number}} - {{
+                                    <div class="font-semibold text-sm">#{{ slotProps.data.order.order_number }} - {{
                                         slotProps.data.order.client_name }}</div>
                                     <!-- Address with reduced font size and faint color -->
                                     <div class="flex items-center space-x-2 text-xs text-gray-400">
-    
+
                                         <EmailAtIcon :height="15" :width="15" />
-    
+
                                         {{ slotProps.data.order.email }}
-    
+
                                     </div>
                                 </div>
                             </div>
@@ -79,37 +84,39 @@
                             <InputText v-model="filterModel.value" placeholder="Client name" class="w-full" />
                         </template>
                     </Column>
-    
+
                     <!-- Rug Name Column with Filter -->
                     <Column field="shape" header="Order Info" sortable :filter="true">
                         <template #body="slotProps">
                             <div class="flex items-center">
                                 <!-- Using the InitialAvatar component -->
-    
+
                                 <div class="ml-3">
-                                    <div class="font-normal text-sm">{{slotProps.data.order.rug.name }} - {{
+                                    <div class="font-normal text-sm">{{ slotProps.data.order.rug.name }} - {{
                                         slotProps.data.order.shape }}</div>
                                     <div class="font-semibold text-sm">{{ slotProps.data.order.length }} x {{
                                         slotProps.data.order.width }}
                                         {{
-                                        slotProps.data.order.unit }}</div>
+                                            slotProps.data.order.unit }}</div>
                                 </div>
                             </div>
-    
+
                         </template>
-    
+
                     </Column>
-    
+
                     <!-- Order Size Column with Filter -->
                     <Column field="start_date" header="Start, End Date" sortable :filter="true">
                         <template #body="slotProps">
                             <div class="flex items-center">
-    
-    
+
+
                                 <div class="ml-3">
-                                    <div class="font-normal text-sm">{{ formatDateString(slotProps.data.start_date) }} - {{
-                                        formatDateString(slotProps.data.approx_end_date) }}</div>
-                                    <div class="font-bold text-sm">{{ formatCurrency(slotProps.data.approx_production_cost)
+                                    <div class="font-normal text-sm">{{ formatDateString(slotProps.data.start_date) }} -
+                                        {{
+                                            formatDateString(slotProps.data.approx_end_date) }}</div>
+                                    <div class="font-bold text-sm">{{
+                                        formatCurrency(slotProps.data.approx_production_cost)
                                         }}
                                     </div>
                                 </div>
@@ -120,7 +127,7 @@
                                 class="w-full" />
                         </template>
                     </Column>
-    
+
                     <!-- Status Column with Filter -->
                     <Column field="status" header="Status" sortable :filter="true">
                         <template #body="slotProps">
@@ -133,7 +140,7 @@
                                 class="w-full" />
                         </template>
                     </Column>
-    
+
                     <!-- Actions Column -->
                     <Column header="Actions">
                         <template #body="slotProps">
@@ -156,59 +163,60 @@
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
                                     </svg>
-    
+
                                 </Button>
                                 <!-- Edit Button -->
-                                <Button @click="showConfirmModal = true;productionStore.setSelectedOrder(slotProps.data) "
+                                <Button
+                                    @click="showConfirmModal = true; productionStore.setSelectedOrder(slotProps.data)"
                                     variant='outline' size="sm" class="p-button-rounded p-button-warning p-button-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" width="20" height="20">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
                                     </svg>
-    
+
                                 </Button>
                             </div>
                         </template>
                     </Column>
-    
-    
+
+
                     <template #empty>
                         <div class="flex flex-col items-center justify-center py-10 text-gray-500">
                             <p class="mt-4 text-lg font-semibold">No production items found</p>
                             <p class="text-sm text-gray-400">Try adding new production items to see them here.</p>
                         </div>
                     </template>
-    
+
                 </DataTable>
-    
-    
+
+
             </div>
         </template>
-    
+
         <ViewProductionModal :isViewProductionModal="isViewProductionModal" :workInProgress="selectedWorkInProgress"
-            @update:isViewProductionModal="(value ) => isViewProductionModal = value" />
-    
+            @update:isViewProductionModal="(value) => isViewProductionModal = value" />
+
     </admin-layout>
 </template>
-    
+
 <script lang="ts" setup>
 import {
-  ref,
-  onMounted
+    ref,
+    onMounted
 } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import InitialAvatar from '@/components/common/InitialAvatar.vue'
 import CustomSelectField from '@/components/forms/FormElements/CustomSelectField.vue'
 import {
-  PhoneIcon
+    PhoneIcon
 } from '~/icons'
 import {
-  EmailAtIcon
+    EmailAtIcon
 } from '~/icons'
 import {
-  MapPinIcon
+    MapPinIcon
 } from '~/icons'
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
@@ -220,7 +228,7 @@ import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
 
 import {
-  FilterMatchMode
+    FilterMatchMode
 } from '@primevue/core/api';
 
 import { useCurrency } from '~/composables/useCurrency';
@@ -242,6 +250,9 @@ const isMounted = ref(false) // Track if component has mounted
 
 const snackbar = useSnackbar();
 
+const config = useRuntimeConfig();
+
+
 const isLoading = computed(() => productionStore.isLoading);
 const workInProgressItems = computed(() => productionStore.workInProgressItems);
 
@@ -256,7 +267,7 @@ const isStartProductionFormModal = ref(false)
 
 
 onMounted(() => {
-  isMounted.value = true // Set to true once component is mounted
+    isMounted.value = true // Set to true once component is mounted
 })
 
 // const filters = ref({
@@ -268,10 +279,10 @@ onMounted(() => {
 // });
 
 const handleViewProductionModal = (workInProgress: WorkInProgress) => {
-  //   productionStore.setSelectedWorkInProgress(workInProgress);
-  //   isViewProductionModal.value = true;
-  //navigate to production view 
-  navigateTo(`/admin/production/${workInProgress.id}`);
+    //   productionStore.setSelectedWorkInProgress(workInProgress);
+    //   isViewProductionModal.value = true;
+    //navigate to production view 
+    navigateTo(`/admin/production/${workInProgress.id}`);
 
 
 }
@@ -280,68 +291,67 @@ const selectedStatus = ref('all');
 
 
 const filters: any = ref({
-  global: {
-    value: null,
-    matchMode: FilterMatchMode.CONTAINS
-  },
-  email: {
-    value: null,
-    matchMode: FilterMatchMode.CONTAINS
-  },
-  client_name: {
-    value: null,
-    matchMode: FilterMatchMode.STARTS_WITH
-  },
-  'rug.name': {
-    value: null,
-    matchMode: FilterMatchMode.STARTS_WITH
-  },
-  'status': {
-    value: null,
-    matchMode: FilterMatchMode.EQUALS
-  },
+    global: {
+        value: null,
+        matchMode: FilterMatchMode.CONTAINS
+    },
+    email: {
+        value: null,
+        matchMode: FilterMatchMode.CONTAINS
+    },
+    client_name: {
+        value: null,
+        matchMode: FilterMatchMode.STARTS_WITH
+    },
+    'rug.name': {
+        value: null,
+        matchMode: FilterMatchMode.STARTS_WITH
+    },
+    'status': {
+        value: null,
+        matchMode: FilterMatchMode.EQUALS
+    },
 });
 
 function applyStatusFilter(status: string) {
-  selectedStatus.value = status
+    selectedStatus.value = status
 
-  // clear / set the table filter
-  filters.value.status.value =
-    status === 'All' ? null : status.toLowerCase()
+    // clear / set the table filter
+    filters.value.status.value =
+        status === 'All' ? null : status.toLowerCase()
 }
 
 
 
 const sizeOptions = ref([
-  { label: 'Small', value: 'Small' },
-  { label: 'Medium', value: 'Medium' },
-  { label: 'Large', value: 'Large' }
+    { label: 'Small', value: 'Small' },
+    { label: 'Medium', value: 'Medium' },
+    { label: 'Large', value: 'Large' }
 ]);
 
 const statusOptions = ref([
-  { label: 'Pending', value: 'pending' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Cancelled', value: 'cancelled' }
+    { label: 'Pending', value: 'pending' },
+    { label: 'Completed', value: 'completed' },
+    { label: 'Cancelled', value: 'cancelled' }
 ]);
 
 definePageMeta({
-  middleware: [
-    function (to, from) {
-      // Custom inline middleware
-    },
-    'auth',
-  ],
+    middleware: [
+        function (to, from) {
+            // Custom inline middleware
+        },
+        'auth',
+    ],
 });
 
 const currentPageTitle = ref('Production')
 
 onMounted(async () => {
-  await productionStore.getWorkInProgress(); // Fetch only if user is not loaded
+    await productionStore.getWorkInProgress(); // Fetch only if user is not loaded
 
 });
 
 //handle select order
 
 
-    </script>
-    
+</script>

@@ -1,6 +1,7 @@
 import type { AuthResponse, LoginCredentials, User } from "~/utils/models/auth";
 import type { AddWorkInProgressMaterialRequest, UpdateWorkInProgress, UpdateWorkInProgressResponse, WorkInProgress, WorkInProgressData, WorkInProgressMaterial, WorkInProgressMaterialResponse, WorkInProgressResponse, WorkIProgressResponse } from "~/utils/models/production";
 import type { CreateResponse } from "~/utils/models/rug";
+import type { RugCostCalculationRequest, RugCostCalculationResponse, RugCostCalculationResponseData } from "~/utils/models/rug";
 
 export const useProductionStore = defineStore("production", {
     state: () => ({
@@ -14,7 +15,11 @@ export const useProductionStore = defineStore("production", {
         selectedWorkInProgress: {} as WorkInProgress, // Add selectedWorkInProgress to the state
         materials: [] as WorkInProgressMaterial[], // Add materials to the state
         materialsForm: [] as AddWorkInProgressMaterialRequest[], // Add materialsForm to the state
-        updateMaterialsForm: [] as AddWorkInProgressMaterialRequest[]
+        updateMaterialsForm: [] as AddWorkInProgressMaterialRequest[],
+        // Add state for rug cost calculation
+        rugCostCalculation: null as RugCostCalculationResponseData | null,
+        rugCostCalculationLoading: false,
+        rugCostCalculationError: null as string | null,
 
         // Add startProductionForm to the state
     }),
@@ -210,13 +215,47 @@ export const useProductionStore = defineStore("production", {
             }
         },
 
+        // Calculate rug cost
+        async calculateRugCost(width_cm: number, height_cm: number) {
+            this.rugCostCalculationLoading = true;
+            this.rugCostCalculationError = null;
+            this.rugCostCalculation = null;
+            if (!this.token) {
+                this.rugCostCalculationError = "No auth token found.";
+                this.rugCostCalculationLoading = false;
+                return;
+            }
+            try {
+                const response = await $fetch<RugCostCalculationResponse>(getApiUrl("rugs/calculate-cost"), {
+                    method: "POST",
+                    body: { width_cm, height_cm },
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (response?.success && response.response) {
+                    this.rugCostCalculation = response.response;
+                } else {
+                    this.rugCostCalculationError = response?.message || "Failed to calculate rug cost.";
+                }
+            } catch (error) {
+                const errorMsg = handleApiError(error);
+                this.rugCostCalculationError = errorMsg.errorMessage || "An error occurred while calculating rug cost.";
+            } finally {
+                this.rugCostCalculationLoading = false;
+            }
+        },
+
+        clearRugCostCalculation() {
+            this.rugCostCalculation = null;
+            this.rugCostCalculationError = null;
+            this.rugCostCalculationLoading = false;
+        },
 
     },
     getters: {
         // Add any getters if needed
-    },
-    persist: {
-        enabled: true,
-        strategies: [],
-    },
+    }
 });

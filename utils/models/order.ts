@@ -6,6 +6,7 @@ export interface CreateOrderRequest {
     total_price: number;
     color_palet: string[];
     image: any;
+    deposit_amount:number,
     delivery_date: Date;
     description: string;
     unit: string;

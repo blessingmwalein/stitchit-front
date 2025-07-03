@@ -55,17 +55,23 @@
             </Tab>
             <Tab value="4">
               <span class="inline-flex items-center gap-2 text-sm">
-                <BoxCubeIcon />
-                Raw Materials
+                <PieChartIcon />
+                Product Cost
               </span>
             </Tab>
             <Tab value="5">
               <span class="inline-flex items-center gap-2 text-sm">
                 <BoxCubeIcon />
-                Product
+                Raw Materials
               </span>
             </Tab>
             <Tab value="6">
+              <span class="inline-flex items-center gap-2 text-sm">
+                <BoxCubeIcon />
+                Product
+              </span>
+            </Tab>
+            <Tab value="7">
               <span class="inline-flex items-center gap-2 text-sm">
                 <ClipBoardIcon />
                 Summary
@@ -154,6 +160,64 @@
             </TabPanel>
 
             <TabPanel value="4">
+              <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Approximate Product Cost</h4>
+                <div v-if="productionStore.rugCostCalculationLoading" class="text-center py-8">
+                  <span>Loading cost calculation...</span>
+                </div>
+                <div v-else-if="productionStore.rugCostCalculationError" class="text-red-500 py-8">
+                  {{ productionStore.rugCostCalculationError }}
+                </div>
+                <div v-else-if="productionStore.rugCostCalculation" class="space-y-6">
+                  <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-1">
+                      <div class="mb-2 text-gray-700 dark:text-gray-200">
+                        <span class="font-semibold">Dimensions:</span>
+                        {{ productionStore.rugCostCalculation.dimensions_cm.width }}cm x {{ productionStore.rugCostCalculation.dimensions_cm.height }}cm
+                      </div>
+                      <div class="mb-2 text-gray-700 dark:text-gray-200">
+                        <span class="font-semibold">Area:</span>
+                        {{ productionStore.rugCostCalculation.area_sq_cm }} sq cm
+                      </div>
+                      <div class="mb-2 text-gray-700 dark:text-gray-200">
+                        <span class="font-semibold">Total Price:</span>
+                        {{ formatCurrency(productionStore.rugCostCalculation.total_price) }}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="font-semibold mb-2">Material Breakdown</h5>
+                    <div class="overflow-x-auto rounded-lg shadow">
+                      <table class="min-w-full text-sm text-left text-gray-700 dark:text-gray-200 divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900 rounded-lg">
+                        <thead class="bg-gray-50 dark:bg-gray-800 text-xs uppercase font-medium">
+                          <tr>
+                            <th class="py-3 px-4">Material</th>
+                            <th class="py-3 px-4">Type</th>
+                            <th class="py-3 px-4">Used</th>
+                            <th class="py-3 px-4">Unit</th>
+                            <th class="py-3 px-4">Unit Price</th>
+                            <th class="py-3 px-4">Cost</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="mat in productionStore.rugCostCalculation.materials" :key="mat.material_id" class="odd:bg-gray-50 even:bg-white dark:odd:bg-gray-800 dark:even:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <td class="py-2 px-4 font-medium">{{ mat.material_name }}</td>
+                            <td class="py-2 px-4">{{ mat.material_type }}</td>
+                            <td class="py-2 px-4">{{ mat.used }}</td>
+                            <td class="py-2 px-4">{{ mat.unit }}</td>
+                            <td class="py-2 px-4">{{ formatCurrency(mat.price_per_unit) }}</td>
+                            <td class="py-2 px-4 font-semibold">{{ formatCurrency(mat.cost) }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="text-gray-500 py-8">No cost data available.</div>
+              </div>
+            </TabPanel>
+
+            <TabPanel value="5">
               <DataTable v-model:editingRows="editingRows" :loading="isLoading" editMode="row" dataKey="id" paginator
                 :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="materials" stripedRows
                 tableStyle="min-width: 50rem" @row-edit-save="onRowEditSave" :pt="{
@@ -254,7 +318,7 @@
 
               </DataTable>
             </TabPanel>
-            <TabPanel value="5">
+            <TabPanel value="6">
               <div v-if="!product">
                 <!-- Empty state -->
                 <div
@@ -331,7 +395,7 @@
             </TabPanel>
 
 
-            <TabPanel value="6">
+            <TabPanel value="7">
               <div class="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
                 <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Summary</h4>
 
@@ -430,7 +494,7 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import ProfileCard from '@/components/profile/ProfileCard.vue'
@@ -466,6 +530,7 @@ import { PlugInIcon, TrashIcon } from '~/icons'
 import type { FinishedProduct } from '~/utils/models/finished_products'
 import DetailSkeletonLoader from '~/components/ui/DetailSkeletonLoader.vue'
 import ProductImageSlider from '~/components/production/ProductImageSlider.vue'
+import PieChartIcon from '~/icons/PieChartIcon.vue'
 
 
 const { formatCurrency } = useCurrency();
@@ -599,6 +664,12 @@ onMounted(async () => {
     await materialsStore.getMaterials(id)
     await finishedProductStore.getFinishedProductByWorlInProgressId(id)
   }
+  if (workInProgress.value?.order?.width && workInProgress.value?.order?.length) {
+    productionStore.calculateRugCost(
+      Number(workInProgress.value.order.width),
+      Number(workInProgress.value.order.length)
+    )
+  }
 });
 
 
@@ -709,6 +780,18 @@ const oenEditProduct = (product: FinishedProduct) => {
 
   isFinishedProductFormModal.value = true;
 }
+
+const selectedTab = ref(0)
+
+watch(selectedTab, (val) => {
+  if (val === 4 && workInProgress.value?.order?.width && workInProgress.value?.order?.length) {
+    // Convert to cm if needed, assuming width and length are in cm
+    productionStore.calculateRugCost(
+      Number(workInProgress.value.order.width),
+      Number(workInProgress.value.order.length)
+    )
+  }
+})
 </script>
 
 <style lang="css">

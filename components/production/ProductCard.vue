@@ -9,7 +9,6 @@
       :numVisible="1"
       :numScroll="1"
       :circular="true"
-      orientation="vertical"
       :showIndicators="images.length > 1"
       class="absolute inset-0 w-full h-full"
     >
@@ -22,7 +21,7 @@
           />
           <div
             v-if="slotProps.data.image_name"
-            class="absolute top-4 left-0 right-0 text-center z-0"
+            class="absolute top-4 left-0 right-0 text-center z-10"
           >
             <span
               class="text-sm text-white bg-black bg-opacity-50 px-2 py-1 rounded"
@@ -55,7 +54,7 @@
 
     <!-- Overlay Product Info -->
     <div
-      class="absolute inset-x-0 bottom-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/80 via-black/60 to-transparent h-1/2 z-0"
+      class="absolute inset-x-0 bottom-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/80 via-black/60 to-transparent h-1/2 z-10"
     >
       <h3 class="text-xl font-medium text-white truncate">{{ product.name }}</h3>
       <p class="mt-1.5 text-sm text-white line-clamp-3">

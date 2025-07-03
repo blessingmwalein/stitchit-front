@@ -1,5 +1,5 @@
 <template>
-  <Modal v-if="isOrderFormModal" @close="closeModal()">
+  <Modal v-if="isOrderFormModal" @close="closeModal()" width="max-w-4xl">
     <template #header>
       <button @click="closeModal()"
         class="absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-gray-700">
@@ -16,10 +16,26 @@
         <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
           {{ order ? 'Update the order details below.' : 'Fill in the details to create a new order.' }}
         </p>
+
+        <div v-if="productionStore.rugCostCalculationLoading"
+          class="mb-4 p-2 rounded bg-blue-100 text-blue-700 text-center text-sm">
+          Calculating approximate production cost...
+        </div>
+        <div v-else-if="productionStore.rugCostCalculationError"
+          class="mb-4 p-2 rounded bg-red-100 text-red-700 text-center text-sm">
+          {{ productionStore.rugCostCalculationError }}
+        </div>
+        <div v-else-if="productionStore.rugCostCalculation && productionStore.rugCostCalculation.total_price"
+          class="mb-4 p-2 rounded bg-green-100 text-green-700 text-center text-base font-semibold">
+          Approximate Production Cost: <span class="font-bold">{{
+            formatCurrency(productionStore.rugCostCalculation.total_price) }}</span>
+        </div>
       </div>
     </template>
     <template #body>
       <div class="no-scrollbar relative w-full overflow-y-auto bg-white dark:bg-gray-900">
+        <!-- Snackbar/Inline notification for Approximate Production Cost -->
+
         <!-- Image Upload Section -->
         <Alert v-if="orderStore.errorMessage" variant="error" title="Something went wrong"
           :message="orderStore.errorMessage ?? ''" :showLink="false" />
@@ -34,41 +50,71 @@
             <img :src="imageSrcComputed" alt="Image preview" class="image-preview" />
           </div>
         </div>
-  
+
         <client-only>
           <Vueform @submit="handleSubmit" v-model="orderForm" :show-errors="false" :display-errors="false"
             :endpoint="false" sync>
+
+            <!-- Rug Details Section -->
+            <StaticElement tag="h5" content="Rug Details" :columns="{ container: 12 }"
+              class="text-lg font-semibold mb-2" />
+
+            <SelectElement label="Select Rug" name="rug_id" :native="false" :rules="['required']"
+              :columns="{ container: 4 }"
+              :items="rugsStore.rugs.data.map(rug => ({ value: rug.id, label: `${rug.name} - $${rug.approx_cost}` }))" />
+            <SelectElement label="Shape" name="shape" :search="true" :native="false" :rules="['required']"
+              :columns="{ container: 4 }" :items="shapesData" />
+            <SelectElement label="Unit" name="unit" :native="false" :rules="['required']" :columns="{ container: 4 }"
+              :items="unitsData" />
+            <TextElement name="length" input-type="number" label="Length (cm)" :rules="['required']"
+              :columns="{ container: 4 }" />
+            <TextElement name="width" input-type="number" label="Width (cm)" :rules="['required']"
+              :columns="{ container: 4 }" />
+
+
+
+
+
+            <TagsElement :search="true" name="color_palet" label="Color Palette" :rules="['required']"
+              :columns="{ container: 4 }" :items="colorsData" />
+
+            <!-- Client Section -->
+            <StaticElement tag="h5" content="Client Details" :columns="{ container: 12 }"
+              class="text-lg font-semibold mt-4 mb-2" />
+
             <SelectElement label="Select Client" :search="true" @search-change="searchClients" name="client_id"
               :native="false" :rules="['required']" :columns="{ container: 6 }"
               :items="clientStore.clients?.data?.map(client => ({ value: client.id, label: client.name }))" />
-            <SelectElement label="Select Rug" name="rug_id" :native="false" :rules="['required']"
-              :columns="{ container: 6 }"
-              :items="rugsStore.rugs.data.map(rug => ({ value: rug.id, label: `${rug.name} - $${rug.approx_cost}` }))" />
-  
-            <TextElement name="total_price" input-type="number" label="Total Price" :rules="['required']"
-              :columns="{ container: 6 }" />
-            <TagsElement :search="true" name="color_palet" label="Color Palette" :rules="['required']"
-              :columns="{ container: 6 }" :items="colorsData" />
-  
-            <SelectElement label="Unit" name="unit" :native="false" :rules="['required']" :columns="{ container: 4 }"
-              :items="unitsData" />
-            <TextElement name="length" input-type="number" label="Length" :rules="['required']"
-              :columns="{ container: 4 }" />
-            <TextElement name="width" input-type="number" label="Width" :rules="['required']"
-              :columns="{ container: 4 }" />
-  
-            <SelectElement label="Shape" name="shape" :search="true" :native="false" :rules="['required']"
-              :columns="{ container: 6 }" :items="shapesData" />
+
+            <!-- Order Details Section -->
+            <StaticElement tag="h5" content="Order Details" :columns="{ container: 12 }"
+              class="text-lg font-semibold mt-4 mb-2" />
+
             <DateElement name="delivery_date" label="Delivery Date" :rules="['required']" :columns="{ container: 6 }" />
-            <TextareaElement name="description" label="Description" :rules="['required', 'max:255']"
-              :columns="{ container: 12 }" />
-  
+            <TextElement name="description" input-type="text" label="Description" :rules="['required']"
+            :columns="{ container: 6 }" />
+            <!-- <TextareaElement name="description" label="Description" :rules="['required', 'max:255']"
+              :columns="{ container: 12 }" /> -->
+
+            <!-- Pricing Section -->
+            <StaticElement tag="h5" content="Pricing & Payment" :columns="{ container: 12 }"
+              class="text-lg font-semibold mt-4 mb-2" />
+
+            <TextElement name="total_price" input-type="number" label="Total Price ($)" :rules="['required']"
+              :columns="{ container: 6 }" />
+
+            <TextElement name="deposit_amount" input-type="number" label="Deposit Amount ($)" :rules="['required']"
+              :columns="{ container: 6 }" />
+
+            <!-- Actions -->
             <StaticElement name="span" :columns="{ container: 4 }" tag="span" />
             <ButtonElement name="close" button-class="bg-red-500" :columns="{ container: 4 }" @click="closeModal()"
               button-label="Close" :full="true" size="lg" />
             <ButtonElement :loading="isLoading" button-class="bg-brand-500" name="register" :columns="{ container: 4 }"
               :submits="true" button-label="Submit" :full="true" size="lg" />
+
           </Vueform>
+
         </client-only>
       </div>
     </template>
@@ -76,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits, onMounted, watch } from 'vue';
+import { ref, computed, defineProps, defineEmits, onMounted, watch, onUnmounted } from 'vue';
 import Modal from '@/components/profile/Modal.vue';
 import { useRugStore } from '~/store/rugs';
 import { useClientsStore } from '~/store/client';
@@ -84,7 +130,8 @@ import { useOrderStore } from '~/store/orders';
 import { colorsData, shapesData, unitsData } from '~/utils/data/colors';
 import Alert from '~/components/ui/Alert.vue';
 import { useRuntimeConfig } from "#app";
-
+import { useCurrency } from '~/composables/useCurrency';
+import { useProductionStore } from '~/store/production';
 
 const config = useRuntimeConfig();
 
@@ -94,6 +141,7 @@ const clientStore = useClientsStore();
 const orderStore = useOrderStore();
 const snackbar = useSnackbar();
 const isLoading = computed(() => orderStore.isLoading)
+const productionStore = useProductionStore();
 
 const imageSrc = ref(null);
 
@@ -114,7 +162,6 @@ const orderForm = computed({
 });
 
 const closeModal = () => {
-
   orderStore.resetForm();
   emit('update:isOrderFormModal', false);
 };
@@ -122,7 +169,6 @@ const closeModal = () => {
 onMounted(async () => {
   await rugsStore.getRugs(); // Fetch only if user is not loaded
   if (props.order !== null) {
-
     searchClients(props.order.client_name)
   }
 });
@@ -158,14 +204,11 @@ const handleSubmit = async () => {
       orderStore.resetForm();
       closeModal();
       //redirect to view order page
-
     }
-
   } catch (error) {
     snackbar.add({ type: "error", text: orderStore.errorMessage });
   }
 };
-
 
 const onFileSelect = (event) => {
   const file = event.files[0];
@@ -180,17 +223,13 @@ const onFileSelect = (event) => {
   reader.readAsDataURL(file);
   // Set the image in the form data
   orderStore.setCreateFormImage(file);
-
 };
 
 watch(() => props.order, async (newOrder: any) => {
   if (newOrder) {
     await searchClients(newOrder.client_name);
-
   }
 }, { immediate: true });
-
-
 
 const searchClients = async (data: any) => {
   console.log(data);
@@ -199,13 +238,46 @@ const searchClients = async (data: any) => {
   clientStore.clientSearchForm.name = data;
   try {
     await clientStore.searchClients();
-
   } catch (error) {
-
   }
 }
 
+const { formatCurrency } = useCurrency();
 
+// Computed: Find selected rug object
+const selectedRug = computed(() => {
+  const rugId = orderForm.value.rug_id;
+  return rugsStore.rugs.data.find((rug: any) => rug.id === rugId) || null;
+});
+
+// Debounce utility
+function debounce(fn: (...args: any[]) => void, delay: number) {
+  let timeout: ReturnType<typeof setTimeout>;
+  return (...args: any[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// Watch for changes in length and width, debounce API call
+const debouncedCalculate = debounce(() => {
+  const length = Number(orderForm.value.length);
+  const width = Number(orderForm.value.width);
+  if (length > 0 && width > 0) {
+    productionStore.calculateRugCost(width, length);
+  } else {
+    productionStore.clearRugCostCalculation();
+  }
+}, 500);
+
+watch(
+  () => [orderForm.value.length, orderForm.value.width],
+  debouncedCalculate
+);
+
+onUnmounted(() => {
+  productionStore.clearRugCostCalculation();
+});
 </script>
 <style scoped>
 .image-container {

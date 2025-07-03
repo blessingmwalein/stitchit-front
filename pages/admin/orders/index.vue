@@ -3,15 +3,15 @@
     <template v-if="isLoading">
       <PageSkeletonLoader />
     </template>
-  
+
     <template v-else>
       <PageBreadcrumb :pageTitle="currentPageTitle" />
       <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-  
+
         <DataTable filterDisplay="menu" :loading="isLoading" dataKey="id" v-model:filters="filters" sortMode="multiple"
           paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" :value="orders.data" stripedRows
           tableStyle="min-width: 50rem" :globalFilterFields="['id', 'rug.name', 'status', 'size.name']">
-  
+
           <template #header>
             <div class="flex justify-between items-center ">
               <!-- Add New Order Button -->
@@ -22,23 +22,23 @@
                     <PlusIcon></PlusIcon>
                   </template>
                 </CustomButton>
-  
+
               </div>
               <!-- Filters -->
               <div class="flex-1 flex justify-center">
                 <div class="flex space-x-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-full border border-gray-300">
                   <button v-for="status in ['All', ...orderStatuses]" :key="status" @click="applyStatusFilter(status)"
-                    :class="[ 
-                    'px-3 py-1 text-sm font-medium rounded-full transition-colors', 
-                    selectedType === status
-                      ? 'bg-white text-indigo-600 shadow border border-gray-300'
-                      : 'text-gray-600 hover:text-indigo-600'
-                  ]">
+                    :class="[
+                      'px-3 py-1 text-sm font-medium rounded-full transition-colors',
+                      selectedType === status
+                        ? 'bg-white text-indigo-600 shadow border border-gray-300'
+                        : 'text-gray-600 hover:text-indigo-600'
+                    ]">
                     {{ status }}
                   </button>
                 </div>
               </div>
-  
+
               <!-- Search input -->
               <div class="flex justify-end">
                 <IconField>
@@ -49,25 +49,26 @@
                 </IconField>
               </div>
             </div>
-  
+
           </template>
-  
+
           <!-- Order ID Column with Filter -->
           <Column field="client_name" header="Client Infor" sortable :filter="true">
             <template #body="slotProps">
               <div class="flex items-center">
                 <!-- Using the InitialAvatar component -->
-                <InitialAvatar :name="slotProps.data.client_name" />
-  
+                <!-- <InitialAvatar :name="slotProps.data.client_name" /> -->
+                <img v-if="slotProps.data?.image_url" :src="`${config.public.imageUrl}${slotProps.data?.image_url}`"
+                  alt="WorkInProgress Image" width="60" height="60" class=" object-cover rounded-2xl" />
                 <div class="ml-3">
                   <div class="font-semibold text-sm">{{ slotProps.data.client_name }}</div>
                   <!-- Address with reduced font size and faint color -->
                   <div class="flex items-center space-x-2 text-xs text-gray-400">
-  
-                    <EmailAtIcon :height="15" :width="15" />
-  
-                    {{ slotProps.data.email }}
-  
+
+                  
+
+                    {{ slotProps.data.order_number }}
+
                   </div>
                 </div>
               </div>
@@ -76,47 +77,47 @@
               <InputText v-model="filterModel.value" placeholder="Client name" class="w-full" />
             </template>
           </Column>
-  
+
           <!-- Rug Name Column with Filter -->
           <Column field="shape" header="Order Info" sortable :filter="true">
             <template #body="slotProps">
               <div class="flex items-center">
                 <!-- Using the InitialAvatar component -->
-  
+
                 <div class="ml-3">
                   <div class="font-normal text-sm">{{ slotProps.data.shape }}</div>
                   <div class="font-semibold text-sm">{{ slotProps.data.length }} x {{ slotProps.data.width }} {{
                     slotProps.data.unit }}</div>
                 </div>
               </div>
-  
+
             </template>
-  
+
           </Column>
           <Column field="rug.name" header="Rug" sortable :filter="true">
             <template #body="slotProps">
               <div class="flex items-center">
                 <!-- Using the InitialAvatar component -->
-  
-  
+
+
                 <div class="ml-3">
                   <div class="font-normal text-sm">{{ slotProps.data.rug.name }}</div>
                   <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data.rug.approx_cost) }}</div>
                 </div>
               </div>
-  
+
             </template>
             <template #filter="{ filterModel }">
               <InputText v-model="filterModel.value" placeholder="Filter by Rug Name" class="w-full" />
             </template>
           </Column>
-  
+
           <!-- Order Size Column with Filter -->
           <Column field="size.name" header="Delivery, Cost" sortable :filter="true">
             <template #body="slotProps">
               <div class="flex items-center">
-  
-  
+
+
                 <div class="ml-3">
                   <div class="font-normal text-sm">{{ formatDateString(slotProps.data.delivery_date) }}</div>
                   <div class="font-semibold text-sm">{{ formatCurrency(slotProps.data.total_price) }}</div>
@@ -127,19 +128,20 @@
               <Dropdown v-model="filterModel.value" :options="sizeOptions" placeholder="Select Size" class="w-full" />
             </template>
           </Column>
-  
+
           <!-- Status Column with Filter -->
           <Column field="status" header="Status" sortable :filter="true">
             <template #body="slotProps">
-  
+
               <OrderStatusBadge :status="slotProps.data.status" />
-  
+
             </template>
             <template #filter="{ filterModel }">
-              <Dropdown v-model="filterModel.value" :options="statusOptions" placeholder="Select Status" class="w-full" />
+              <Dropdown v-model="filterModel.value" :options="statusOptions" placeholder="Select Status"
+                class="w-full" />
             </template>
           </Column>
-  
+
           <!-- Actions Column -->
           <Column header="Actions">
             <template #body="slotProps">
@@ -163,7 +165,7 @@
                   </svg>
                 </Button>
                 <!-- Edit Button -->
-                <Button @click="showConfirmModal = true;ordersStore.setSelectedOrder(slotProps.data) " variant='outline'
+                <Button @click="showConfirmModal = true; ordersStore.setSelectedOrder(slotProps.data)" variant='outline'
                   size="sm" class="p-button-rounded p-button-warning p-button-sm">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" width="20" height="20">
@@ -174,49 +176,50 @@
               </div>
             </template>
           </Column>
-  
-  
+
+
           <template #empty>
             <div class="flex flex-col items-center justify-center py-10 text-gray-500">
               <p class="mt-4 text-lg font-semibold">No orders found</p>
               <p class="text-sm text-gray-400">Try adding new orders to see them here.</p>
             </div>
           </template>
-  
+
         </DataTable>
-  
-  
+
+
       </div>
     </template>
-  
+
     <OrderFormModal :isOrderFormModal="isOrderFormModal" :order="selectedOrder"
       @update:isOrderFormModal="(value) => isOrderFormModal = value" />
-  
-  
+
+
     <StartProductionFormModal :isStartProductionFormModal="isStartProductionFormModal" :order="selectedOrder"
       @update:isStartProductionFormModal="(value) => isStartProductionFormModal = value" />
-  
+
     <ViewOrderModal :isViewOrderModal="isViewOrderModal" :order="selectedOrder"
-      @update:isViewOrderModal="(value ) => isViewOrderModal = value" @processOrder="handleProcessOrder(selectedOrder)"
+      @update:isViewOrderModal="(value) => isViewOrderModal = value" @processOrder="handleProcessOrder(selectedOrder)"
       @startProduction="handleStartProduction(selectedOrder)" @deliverOrder="handleDeliverOrder(selectedOrder)"
       @edit="isViewOrderModal = false; handleEditOrder(selectedOrder)" />
-  
+
     <OrderTemplateModal :isViewProcessOrderModal="isViewProcessOrderModal" :order="selectedOrder"
-      @update:isViewProcessOrderModal="(value ) => isViewProcessOrderModal = value" />
-  
+      @update:isViewProcessOrderModal="(value) => isViewProcessOrderModal = value" />
+
     <DeliverProductModal :isViewDeliverProductModal="isViewDeliverProductModal" :order="selectedOrder"
-      @update:isViewDeliverProductModal="(value ) => isViewDeliverProductModal = value" />
-  
-  
-    <ConfirmModal :visible="showConfirmModal" @update:visible="showConfirmModal = $event" @confirmed="handleConfirmation">
+      @update:isViewDeliverProductModal="(value) => isViewDeliverProductModal = value" />
+
+
+    <ConfirmModal :visible="showConfirmModal" @update:visible="showConfirmModal = $event"
+      @confirmed="handleConfirmation">
       <template #header> Delete Item </template>
       <template #body> Are you sure you want to delete this item? </template>
     </ConfirmModal>
-  
+
   </admin-layout>
 </template>
-  
-  <script lang="ts" setup>
+
+<script lang="ts" setup>
 import {
   ref,
   onMounted
@@ -273,7 +276,10 @@ const selectedType = ref('all');
 
 const snackbar = useSnackbar();
 
-const isLoading =  computed(() => ordersStore.isLoading);
+const config = useRuntimeConfig();
+
+
+const isLoading = computed(() => ordersStore.isLoading);
 const orders = computed(() => ordersStore.orders);
 
 const selectedOrder = computed(() => ordersStore.selectedOrder);
@@ -425,5 +431,4 @@ const handleConfirmation = async (isConfirmed: boolean) => {
     console.log("Action canceled.");
   }
 };
-  </script>
-  
+</script>

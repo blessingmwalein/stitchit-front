@@ -130,7 +130,7 @@
                         <h2 class="font-semibold text-lg mb-2">Payment Details</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <InfoField label="Total Price" :value="formatCurrency(order?.total_price)" />
-                            <InfoField label="Deposit Required" value="$20" />
+                            <InfoField label="Deposit Required" :value="formatCurrency(order?.deposit_amount)" />
                             <InfoField label="Payment Method" value="Cash, InnBucks, Ecocash" />
                         </div>
                     </div>
@@ -139,7 +139,7 @@
                         <h3 class="font-semibold text-lg mb-2">Terms</h3>
                         <ul class="list-disc list-inside text-sm">
                             <li>Delivery date: {{ formatDateString(order.delivery_date) }}</li>
-                            <li>$20 deposit required before processing</li>
+                            <li>{{ formatCurrency(order?.deposit_amount) }} deposit required before processing</li>
                             <li>Balance payable upon delivery</li>
                         </ul>
                     </div>

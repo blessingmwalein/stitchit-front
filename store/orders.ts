@@ -30,6 +30,7 @@ export const useOrderStore = defineStore("order", {
                 formData.append("rug_id", this.createOrderForm.rug_id);
                 formData.append("client_id", this.createOrderForm.client_id);
                 formData.append("total_price", this.createOrderForm.total_price.toString());
+                formData.append("deposit_amount", this.createOrderForm.deposit_amount.toString());
                 formData.append("color_palet", JSON.stringify(this.createOrderForm.color_palet));
                 formData.append("unit", this.createOrderForm.unit);
                 formData.append("description", this.createOrderForm.description);
@@ -84,6 +85,7 @@ export const useOrderStore = defineStore("order", {
                 formData.append("length", this.createOrderForm.length.toString());
                 formData.append("width", this.createOrderForm.width.toString());
                 formData.append("shape", this.createOrderForm.shape);
+                formData.append("deposit_amount", this.createOrderForm.deposit_amount.toString());
 
                 if (this.orderImage) {
                     formData.append("image", this.orderImage as File);
